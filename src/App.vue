@@ -24,6 +24,14 @@
       </v-btn>
       <v-btn
         text
+        href="https://hypernews.cern.ch/HyperNews/CMS/get/prep-ops.html"
+        target="_blank"
+      >
+        <span class="mr-2">HyperNews</span>
+        <v-icon>mdi-open-in-new</v-icon>
+      </v-btn>
+      <v-btn
+        text
         href="https://cms-pdmv.cern.ch/valdb"
         target="_blank"
       >

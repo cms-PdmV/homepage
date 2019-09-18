@@ -29,20 +29,20 @@
     name: 'PdmVBarChart',
     data () {
       return {
-        axis: {
-          // Functions to calculate coordinates
-          x: {},
-          y: {},
-          // Axes themselves
-          xAxis: undefined,
-          yAxis: undefined,
-        },
         plot: {},
+        axis: {
+          x: undefined,
+          y: undefined,
+          xAxis: undefined,
+          yAxis: undefined
+        },
         plotId: 'plot-' + Math.round(Math.random() * 1000000),
         timestamps: [],
         points: [],
         // Color cache
         colors: {},
+        plotMode: 'change',
+        plotScale: 'linear'
       }
     },
 
@@ -58,49 +58,60 @@
     },
     watch: {
       plotData () {
+        this.prepareData();
+      },
+    },
+    methods: {
+      prepareData () {
         let previousWasEmpty = this.points.length == 0;
         // Points are subpieces of a single bar
         this.points = [];
-        // Value of highest bar
-        var maxValue = 1;
         // Number of histogram bars
         let numberOfBars = this.plotData.timestamps.length - 1;
         // Make a list of objects that each represent one piece of a bar
         for (let i = 0; i < numberOfBars; i++) {
-          var startY = 0;
+          var startY = 0.1;
           for (let campaignName in this.plotData.data) {
             let value = this.plotData.data[campaignName]['values'][i]
+            if (this.plotMode === 'cumulative') {
+              for (let j = 0; j < i; j++) {
+                value += this.plotData.data[campaignName]['values'][j];
+              }
+            }
             if (value > 0) {
               var campaignBar = {'name': campaignName,
                                  'value': value,
                                  'start': startY,
+                                 'end': startY + value,
                                  'column': i,
                                  'color': this.plotData.data[campaignName]['color'],
                                  'class': this.plotData.data[campaignName]['class']};
               startY += value;
               this.points.push(campaignBar);
-              maxValue = Math.max(maxValue, startY)
             }
           }
         }
-        maxValue = maxValue * 1.05;
-
-        var x = d3.scaleLinear().range([0, CHART.width]).domain([0, (this.plotData.timestamps.length - 1)]);
-        var xAxis = d3.axisBottom(x).ticks(this.plotData.timestamps.length).tickFormat(this.formatTimestamp);
-        xAxis.scale(x);
-        this.axis.x = x;
-        this.axis.xAxis = xAxis;
-
-        var y = d3.scaleLinear().range([0, CHART.height]).domain([maxValue, 0]);
-        var yAxis = d3.axisLeft(y).ticks(10).tickFormat(this.formatBigNumber);
-        yAxis.scale(y);
-        this.axis.y = y;
-        this.axis.yAxis = yAxis;
 
         this.draw(previousWasEmpty);
       },
-    },
-    methods: {
+
+      scaleChange(newScale) {
+        this.plotScale = newScale;
+        let maxValue = d3.max(this.points, function(e) { return e.start + e.value})
+        this.axis.x = d3.scaleLinear().range([0, CHART.width]).domain([0, (this.plotData.timestamps.length + 0.3 - 1)]);
+        this.axis.xAxis = d3.axisBottom(this.axis.x).ticks(this.plotData.timestamps.length).tickFormat(this.formatTimestamp);
+        this.axis.xAxis.scale(this.axis.x);
+
+        if (newScale === 'log') {
+          this.axis.y = d3.scaleLog().range([0, CHART.height]).domain([maxValue * 10, 0.1]);
+        } else {
+          this.axis.y = d3.scaleLinear().range([0, CHART.height]).domain([maxValue * 1.05, 0]);
+        }
+
+        this.axis.yAxis = d3.axisLeft(this.axis.y).ticks(6).tickFormat(this.formatBigNumber);
+        this.axis.yAxis.scale(this.axis.y);
+      },
+
       formatBigNumber (number) {
         if (number < 1 || number % 1 !== 0) {
             return ''
@@ -136,16 +147,17 @@
        * Draw bars on chart
        */
       draw (previousWasEmpty) {
-        // translate(x, y) specifies where bar begins, +1 to move right of y axis
-        let x = this.axis.x;
-        let y = this.axis.y;
-        var chart = this.plot.chart;
+        this.scaleChange(this.plotScale);
+        var x = this.axis.x;
+        var y = this.axis.y;
+        let xAxis = this.axis.xAxis;
+        let yAxis = this.axis.yAxis;
 
-        var y0 = y(0);
-        var x01 = x(0.1);
-        var x005 = x(0.05);
-        let component = this;
-        let tooltip = this.plot.tooltip;
+        let chart = this.plot.chart;
+
+        let y0 = y(0.1);
+        let x005 = x(0.05);
+        let x03 = x(0.3);
 
         if (!previousWasEmpty) {
           chart.selectAll('rect.bar').transition()
@@ -154,19 +166,21 @@
                .ease(d3.easeQuadIn)
                .attr('height', function(d) { return 0 })
                .attr('transform', function(d) {
-                 return 'translate(' + (x(d.column) + x005) + ',' + (WRAPPER.padding.top + y0) + ')';
+                 return 'translate(' + (x(d.column) + x03 + x005) + ',' + (WRAPPER.padding.top + y0) + ')';
                })
         }
 
+        let component = this;
+        let tooltip = this.plot.tooltip;
         chart.selectAll('.x.axis')
              .transition()
              .duration(650)
-             .call(this.axis.xAxis);
+             .call(xAxis);
 
         chart.selectAll('.y.axis')
              .transition()
              .duration(650)
-             .call(this.axis.yAxis);
+             .call(yAxis);
 
         chart.selectAll('.x.axis .tick>text')
              .attr('transform', 'rotate(-25)')
@@ -181,10 +195,10 @@
              .append('rect')
              // Initial bar position and size
              .attr('class', function(d) { return 'bar ' + d.class; })
-             .style('opacity', '1')
+             .style('opacity', 1)
              .attr('fill', function(d) { return d.color; })
              .attr('transform', function(d) {
-               return 'translate(' + (x(d.column) + x005) + ',' + (WRAPPER.padding.top + y0) + ')';
+               return 'translate(' + (x(d.column) + x03 + x005) + ',' + (WRAPPER.padding.top + y0) + ')';
              })
              .attr('width', function(d) { return x(0.9) })
              .attr('height', function(d) { return 0})
@@ -192,7 +206,8 @@
              .on('mousemove', function(d) {
                let tooltipX = d3.event.pageX + 5;
                let tooltipY = d3.event.pageY + 5;
-               tooltip.html(d.name + '<br> ' + component.formatBigNumber(d.value))
+               tooltip.html(d.name +
+                            '<br>Events ' + component.formatBigNumber(d.value))
                       .style('left', `${tooltipX}px`)
                       .style('top', `${tooltipY}px`)
                tooltip.style('opacity', 0.95)
@@ -211,9 +226,9 @@
              .delay((data, index) => data.column * 25 + (previousWasEmpty ? 0 : 150))
              .duration(500)
              .ease(d3.easeBackOut.overshoot(1.7))
-             .attr('height', function(d) { return y0 - y(d.value) })
+             .attr('height', function(d) { return y(d.start) - y(d.end) })
              .attr('transform', function(d) {
-               return 'translate(' + (x(d.column) + x005) + ',' + (WRAPPER.padding.top + y(d.value) - y0 + y(d.start)) + ')';
+               return 'translate(' + (x(d.column) + x03 + x005) + ',' + (WRAPPER.padding.top + y(d.end)) + ')';
              })
       }
     },
@@ -237,23 +252,34 @@
 
       this.plot.chart.append('svg:g')
                      .attr('class', 'x axis')
-                     .attr('fill', '#666')
                      .attr('transform', 'translate(0,' + (WRAPPER.padding.top + CHART.height) + ')')
 
       this.plot.chart.append('svg:g')
                      .attr('class', 'y axis')
-                     .attr('fill', '#666')
                      .attr('transform', 'translate(0,' + WRAPPER.padding.top + ')')
 
-      let component = this
+      this.plot.chart.append("text")
+                     .text('EVENTS')
+                     .attr("class", "y-label")
+                     .attr("transform", "rotate(-90) translate(-"+WRAPPER.padding.top+", 14)")
+
+      let component = this;
       this.eventBus.$on('campaignHover', function(campaign) {
         if (campaign){
-          component.plot.chart.selectAll(".bar").style("opacity", "0.3")
+          component.plot.chart.selectAll(".bar").style("opacity", "0.6")
           // Set only some to opaque, based on campaign name
           component.plot.chart.selectAll(".bar." + campaign.class).style("opacity", "1")
         } else {
           component.plot.chart.selectAll(".bar").style("opacity", "1")
         }
+      })
+      this.eventBus.$on('plotModeChange', function(mode) {
+        component.plotMode = mode;
+        component.prepareData();
+      })
+      this.eventBus.$on('plotScaleChange', function(scale) {
+        component.plotScale = scale;
+        component.draw(component.points.length === 0)
       })
     }
 };
@@ -281,6 +307,13 @@
     background: #2e6da4;
     text-align: center;
     color: white;
+    font-family: Roboto;
+  }
+
+  .y-label {
+    text-anchor: end;
+    font-size: 0.85em;
+    fill: #333;
     font-family: Roboto;
   }
 

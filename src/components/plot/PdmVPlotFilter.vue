@@ -40,12 +40,12 @@
         </v-expansion-panel-content>
       </v-expansion-panel>
 
-<!--       <v-expansion-panel>
-        <v-expansion-panel-header>Plot Options</v-expansion-panel-header>
+      <v-expansion-panel>
+        <v-expansion-panel-header>Plot Mode</v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-radio-group v-model="plotMode">
-            <v-radio :key="'change'" :label="'Change mode'" :value="'change'"></v-radio>
-            <v-radio :key="'cumulative'" :label="'Cumulative mode'" :value="'cumulative'"></v-radio>
+            <v-radio :key="'change'" :label="'Newly produced'" :value="'change'"></v-radio>
+            <v-radio :key="'cumulative'" :label="'Cumulative'" :value="'cumulative'"></v-radio>
           </v-radio-group>
         </v-expansion-panel-content>
       </v-expansion-panel>
@@ -58,7 +58,7 @@
             <v-radio :key="'log'" :label="'Logarithmic'" :value="'log'"></v-radio>
           </v-radio-group>
         </v-expansion-panel-content>
-      </v-expansion-panel> -->
+      </v-expansion-panel>
     </v-expansion-panels>
   </div>
 </template>
@@ -130,6 +130,12 @@ export default {
                                              'pwgs': enabledPwgs})
       },
       deep: true
+    },
+    plotMode () {
+      this.eventBus.$emit('plotModeChange', this.plotMode)
+    },
+    plotScale () {
+      this.eventBus.$emit('plotScaleChange', this.plotScale)
     }
   },
   methods: {
