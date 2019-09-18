@@ -252,7 +252,7 @@
 
       this.plot.chart.append('svg:g')
                      .attr('class', 'x axis')
-                     .attr('transform', 'translate(0,' + (WRAPPER.padding.top + CHART.height) + ')')
+                     .attr('transform', 'translate(15,' + (WRAPPER.padding.top + CHART.height) + ')')
 
       this.plot.chart.append('svg:g')
                      .attr('class', 'y axis')
