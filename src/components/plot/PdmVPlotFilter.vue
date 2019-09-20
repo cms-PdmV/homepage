@@ -59,6 +59,16 @@
           </v-radio-group>
         </v-expansion-panel-content>
       </v-expansion-panel>
+
+      <v-expansion-panel>
+        <v-expansion-panel-header>Bubble Legend</v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-radio-group v-model="bubbleLegend">
+            <v-radio :key="'off'" :label="'Hidden'" :value="'off'"></v-radio>
+            <v-radio :key="'on'" :label="'Visible'" :value="'on'"></v-radio>
+          </v-radio-group>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
     </v-expansion-panels>
   </div>
 </template>
@@ -78,6 +88,7 @@ export default {
       },
       plotMode: 'change',
       plotScale: 'linear',
+      bubbleLegend: 'off'
     }
   },
   created () {
@@ -136,7 +147,10 @@ export default {
     },
     plotScale () {
       this.eventBus.$emit('plotScaleChange', this.plotScale)
-    }
+    },
+    bubbleLegend () {
+      this.eventBus.$emit('bubbleLegendChange', this.bubbleLegend)
+    },
   },
   methods: {
     prepareFilters() {
