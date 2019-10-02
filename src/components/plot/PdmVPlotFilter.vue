@@ -2,7 +2,11 @@
   <div>
     <v-expansion-panels>
       <v-expansion-panel>
-        <v-expansion-panel-header>Priority Block Filter</v-expansion-panel-header>
+        <v-expansion-panel-header>Priority Block Filter&nbsp;
+          <span style="opacity: 0.6" v-if="dataFiltersNumbers.blocks.selected != dataFiltersNumbers.blocks.all">
+            (selected {{dataFiltersNumbers.blocks.selected}} out of {{dataFiltersNumbers.blocks.all}})
+          </span>
+        </v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-checkbox
             class="checkboxmargin"
@@ -11,11 +15,17 @@
             :key="block.name"
             :label="block.displayName"
           ></v-checkbox>
+          <v-btn @click="setAll(dataFilters.blocks, true)" class="mr-2">Select all</v-btn>
+          <v-btn @click="setAll(dataFilters.blocks, false)">Deselect all</v-btn>
         </v-expansion-panel-content>
       </v-expansion-panel>
 
       <v-expansion-panel>
-        <v-expansion-panel-header>Campaign Filter</v-expansion-panel-header>
+        <v-expansion-panel-header>Campaign Filter&nbsp;
+          <span style="opacity: 0.6" v-if="dataFiltersNumbers.campaigns.selected != dataFiltersNumbers.campaigns.all">
+            (selected {{dataFiltersNumbers.campaigns.selected}} out of {{dataFiltersNumbers.campaigns.all}})
+          </span>
+        </v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-checkbox
             class="checkboxmargin"
@@ -24,11 +34,17 @@
             :key="campaign.name"
             :label="campaign.name"
           ></v-checkbox>
+          <v-btn @click="setAll(dataFilters.campaigns, true)" class="mr-2">Select all</v-btn>
+          <v-btn @click="setAll(dataFilters.campaigns, false)">Deselect all</v-btn>
         </v-expansion-panel-content>
       </v-expansion-panel>
 
       <v-expansion-panel>
-        <v-expansion-panel-header>PWG Filter</v-expansion-panel-header>
+        <v-expansion-panel-header>PWG Filter&nbsp;
+          <span style="opacity: 0.6" v-if="dataFiltersNumbers.pwgs.selected != dataFiltersNumbers.pwgs.all">
+            (selected {{dataFiltersNumbers.pwgs.selected}} out of {{dataFiltersNumbers.pwgs.all}})
+          </span>
+        </v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-checkbox
             class="checkboxmargin"
@@ -37,6 +53,8 @@
             :key="pwg.name"
             :label="pwg.name"
           ></v-checkbox>
+          <v-btn @click="setAll(dataFilters.pwgs, true)" class="mr-2">Select all</v-btn>
+          <v-btn @click="setAll(dataFilters.pwgs, false)">Deselect all</v-btn>
         </v-expansion-panel-content>
       </v-expansion-panel>
 
@@ -85,6 +103,20 @@ export default {
         blocks: [],
         campaigns: [],
         pwgs: [],
+      },
+      dataFiltersNumbers:{
+        blocks: {
+          all: 0,
+          selected: 0
+        },
+        campaigns: {
+          all: 0,
+          selected: 0
+        },
+        pwgs: {
+          all: 0,
+          selected: 0
+        },
       },
       plotMode: 'change',
       plotScale: 'linear',
@@ -136,6 +168,13 @@ export default {
           return map
         }, [])
 
+        this.dataFiltersNumbers.campaigns.all = newVal.campaigns.length;
+        this.dataFiltersNumbers.blocks.all = newVal.blocks.length;
+        this.dataFiltersNumbers.pwgs.all = newVal.pwgs.length;
+        this.dataFiltersNumbers.campaigns.selected = enabledCampaigns.length;
+        this.dataFiltersNumbers.blocks.selected = enabledBlocks.length;
+        this.dataFiltersNumbers.pwgs.selected = enabledPwgs.length;
+
         this.eventBus.$emit('filterChange', {'campaigns': enabledCampaigns,
                                              'blocks': enabledBlocks,
                                              'pwgs': enabledPwgs})
@@ -179,6 +218,11 @@ export default {
       }
       this.dataFilters = newFilters;
     },
+    setAll(objects, value) {
+      for (let key of Object.keys(objects)) {
+        objects[key].selected = value;
+      }
+    }
   }
 }
 

@@ -105,9 +105,19 @@
         this.axis.xAxis.scale(this.axis.x);
 
         if (newScale === 'log') {
-          this.axis.y = d3.scaleLog().range([0, CHART.height]).domain([maxValue * 10, 0.1]);
+          if (isNaN(maxValue) || maxValue < 1) {
+            maxValue = 1;
+          } else {
+            maxValue = maxValue * 10;
+          }
+          this.axis.y = d3.scaleLog().range([0, CHART.height]).domain([maxValue, 0.1]);
         } else {
-          this.axis.y = d3.scaleLinear().range([0, CHART.height]).domain([maxValue * 1.05, 0]);
+          if (isNaN(maxValue) || maxValue < 1) {
+            maxValue = 1;
+          } else {
+            maxValue = maxValue * 1.05;
+          }
+          this.axis.y = d3.scaleLinear().range([0, CHART.height]).domain([maxValue, 0]);
         }
 
         this.axis.yAxis = d3.axisLeft(this.axis.y).ticks(6).tickFormat(this.formatBigNumber);
