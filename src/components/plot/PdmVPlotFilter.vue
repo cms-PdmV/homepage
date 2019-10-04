@@ -4,12 +4,14 @@
       <v-expansion-panel>
         <v-expansion-panel-header>Priority Block Filter&nbsp;
           <span style="opacity: 0.6" v-if="dataFiltersNumbers.blocks.selected != dataFiltersNumbers.blocks.all">
-            (selected {{dataFiltersNumbers.blocks.selected}} out of {{dataFiltersNumbers.blocks.all}})
+            <i>
+              (selected {{dataFiltersNumbers.blocks.selected}} out of {{dataFiltersNumbers.blocks.all}})
+            </i>
           </span>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-checkbox
-            class="checkboxmargin"
+            class="nomargin"
             v-for="block in dataFilters.blocks"
             v-model="block.selected"
             :key="block.name"
@@ -23,12 +25,14 @@
       <v-expansion-panel>
         <v-expansion-panel-header>Campaign Filter&nbsp;
           <span style="opacity: 0.6" v-if="dataFiltersNumbers.campaigns.selected != dataFiltersNumbers.campaigns.all">
-            (selected {{dataFiltersNumbers.campaigns.selected}} out of {{dataFiltersNumbers.campaigns.all}})
+            <i>
+              (selected {{dataFiltersNumbers.campaigns.selected}} out of {{dataFiltersNumbers.campaigns.all}})
+            </i>
           </span>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-checkbox
-            class="checkboxmargin"
+            class="nomargin"
             v-for="campaign in dataFilters.campaigns"
             v-model="campaign.selected"
             :key="campaign.name"
@@ -42,17 +46,25 @@
       <v-expansion-panel>
         <v-expansion-panel-header>PWG Filter&nbsp;
           <span style="opacity: 0.6" v-if="dataFiltersNumbers.pwgs.selected != dataFiltersNumbers.pwgs.all">
-            (selected {{dataFiltersNumbers.pwgs.selected}} out of {{dataFiltersNumbers.pwgs.all}})
+            <i>
+              (selected {{dataFiltersNumbers.pwgs.selected}} out of {{dataFiltersNumbers.pwgs.all}})
+            </i>
           </span>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
-          <v-checkbox
-            class="checkboxmargin"
-            v-for="pwg in dataFilters.pwgs"
-            v-model="pwg.selected"
-            :key="pwg.name"
-            :label="pwg.name"
-          ></v-checkbox>
+          <v-row>
+            <v-col v-for="pwg in dataFilters.pwgs"
+                   cols="6"
+                   sm="4"
+                   class="pt-0 pb-0"
+                   :key="pwg.name">
+              <v-checkbox
+                class="nomargin"
+                v-model="pwg.selected"
+                :label="pwg.name"
+              ></v-checkbox>
+            </v-col>
+          </v-row>
           <v-btn @click="setAll(dataFilters.pwgs, true)" class="mr-2">Select all</v-btn>
           <v-btn @click="setAll(dataFilters.pwgs, false)">Deselect all</v-btn>
         </v-expansion-panel-content>
@@ -61,7 +73,7 @@
       <v-expansion-panel>
         <v-expansion-panel-header>Plot Mode</v-expansion-panel-header>
         <v-expansion-panel-content>
-          <v-radio-group v-model="plotMode">
+          <v-radio-group v-model="plotMode" class="nomargin">
             <v-radio :key="'change'" :label="'Newly produced'" :value="'change'"></v-radio>
             <v-radio :key="'cumulative'" :label="'Cumulative'" :value="'cumulative'"></v-radio>
           </v-radio-group>
@@ -71,7 +83,7 @@
       <v-expansion-panel>
         <v-expansion-panel-header>Plot Scale</v-expansion-panel-header>
         <v-expansion-panel-content>
-          <v-radio-group v-model="plotScale">
+          <v-radio-group v-model="plotScale" class="nomargin">
             <v-radio :key="'linear'" :label="'Linear'" :value="'linear'"></v-radio>
             <v-radio :key="'log'" :label="'Logarithmic'" :value="'log'"></v-radio>
           </v-radio-group>
@@ -81,7 +93,7 @@
       <v-expansion-panel>
         <v-expansion-panel-header>Bubble Legend</v-expansion-panel-header>
         <v-expansion-panel-content>
-          <v-radio-group v-model="bubbleLegend">
+          <v-radio-group v-model="bubbleLegend" class="nomargin">
             <v-radio :key="'off'" :label="'Hidden'" :value="'off'"></v-radio>
             <v-radio :key="'on'" :label="'Visible'" :value="'on'"></v-radio>
           </v-radio-group>
@@ -229,5 +241,13 @@ export default {
 </script>
 
 <style>
+.nomargin {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.v-input__slot {
+  margin-bottom: 0 !important;
+}
 
 </style>

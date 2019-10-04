@@ -15,7 +15,7 @@
     "js-md5": "^0.7.3",
     "roboto-fontface": "*",
     "vue": "^2.6.10",
-    "vuetify": "^2.0.0"
+    "vuetify": "^2.1.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.11.0",

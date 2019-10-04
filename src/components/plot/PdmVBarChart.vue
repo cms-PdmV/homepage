@@ -182,8 +182,8 @@
                })
                .remove()
 
-          chart.selectAll('.legend.bar').remove()
         }
+        chart.selectAll('.legend.bar').remove()
 
         let component = this;
         let tooltip = this.plot.tooltip;
@@ -257,15 +257,48 @@
                         'color': this.plotData.data[campaignName]['color'],
                         'class': this.plotData.data[campaignName]['class'],
                         'x': legendCircleX,
-                        'sum': d3.sum(this.plotData.data[campaignName]['values'])}
+                        'sum': this.plotData.data[campaignName]['sum'],
+                        'niceSum': this.plotData.data[campaignName]['niceSum']}
 
-            item['niceSum'] = this.formatBigNumber(item['sum'])
             campaignColors.push(item)
           }
           campaignColors.sort(function(a, b) { return a.sum > b.sum ? -1 : 1})
           for (let item of campaignColors) {
             item['y'] = legendCircleY;
-            legendCircleY += 20;
+            legendCircleY += 18;
+          }
+          if (campaignColors.length > 1 && this.plotData.summary.monteCarloSum > 0 && this.plotData.summary.rerecoSum > 0) {
+            campaignColors.push({'name': 'Total Monte Carlo',
+                                 'color': 'white',
+                                 'class': 'summary-bubble',
+                                 'x': legendCircleX,
+                                 'y': legendCircleY,
+                                 'sum': this.plotData.summary.monteCarloSum,
+                                 'niceSum': this.plotData.summary.monteCarloNiceSum,
+            })
+            legendCircleY += 18;
+          }
+          if (campaignColors.length > 1 && this.plotData.summary.monteCarloSum > 0 && this.plotData.summary.rerecoSum > 0) {
+            campaignColors.push({'name': 'Total Data ReReco',
+                                 'color': 'white',
+                                 'class': 'summary-bubble',
+                                 'x': legendCircleX,
+                                 'y': legendCircleY,
+                                 'sum': this.plotData.summary.rerecoSum,
+                                 'niceSum': this.plotData.summary.rerecoNiceSum,
+            })
+            legendCircleY += 18;
+          }
+          if (campaignColors.length > 1 && (this.plotData.summary.monteCarloSum > 0 || this.plotData.summary.rerecoSum > 0)) {
+            campaignColors.push({'name': 'Total',
+                                 'color': 'white',
+                                 'class': 'summary-bubble',
+                                 'x': legendCircleX,
+                                 'y': legendCircleY,
+                                 'sum': this.plotData.summary.monteCarloSum + this.plotData.summary.rerecoSum,
+                                 'niceSum': this.plotData.summary.totalNiceSum,
+            })
+            legendCircleY += 18;
           }
 
           var legendCircle = this.plot.chart.selectAll("circle")
@@ -280,13 +313,19 @@
                       .style("fill", function (d) { return d.color; })
                       .attr('display', 'none')
                       .on('mousemove', function(d) {
-                        component.eventBus.$emit('campaignHover', d)
+                        if (d.class !== 'summary-bubble') {
+                          component.eventBus.$emit('campaignHover', d)
+                        }
                       })
                       .on('mouseout', function(d) {
-                        component.eventBus.$emit('campaignHover', undefined)
+                        if (d.class !== 'summary-bubble') {
+                          component.eventBus.$emit('campaignHover', undefined)
+                        }
                       })
                       .on('mousedown', function(d) {
-                        component.eventBus.$emit('campaignClick', d);
+                        if (d.class !== 'summary-bubble') {
+                          component.eventBus.$emit('campaignClick', d);
+                        }
                       })
                       .transition()
                       .delay(500)
@@ -299,13 +338,19 @@
                       .attr('class', function(d) { return 'legend bar ' + d.class; })
                       .attr('display', 'none')
                       .on('mousemove', function(d) {
-                        component.eventBus.$emit('campaignHover', d)
+                        if (d.class !== 'summary-bubble') {
+                          component.eventBus.$emit('campaignHover', d)
+                        }
                       })
                       .on('mouseout', function(d) {
-                        component.eventBus.$emit('campaignHover', undefined)
+                        if (d.class !== 'summary-bubble') {
+                          component.eventBus.$emit('campaignHover', undefined)
+                        }
                       })
                       .on('mousedown', function(d) {
-                        component.eventBus.$emit('campaignClick', d);
+                        if (d.class !== 'summary-bubble') {
+                          component.eventBus.$emit('campaignClick', d)
+                        }
                       })
                       .transition()
                       .delay(500)
@@ -413,10 +458,16 @@
     cursor: pointer;
   }
 
-  @media only screen and (max-width: 600px) {
-  .tooltip {
-    display: none;
+  .summary-bubble {
+    cursor: auto;
+    fill: rgba(0, 0, 0, 0.6);
+    font-style: italic;
   }
-}
+
+  @media only screen and (max-width: 600px) {
+    .tooltip {
+      display: none;
+    }
+  }
 
 </style>

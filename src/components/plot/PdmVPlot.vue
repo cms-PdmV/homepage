@@ -15,7 +15,6 @@
         <div class="pa-2">
           <PdmVTable
             :plotData="plotData"
-            :fetchedData="fetchedData"
             :eventBus="bus">
           </PdmVTable>
         </div>
@@ -47,7 +46,7 @@ export default {
   data () {
     return {
       bus: new Vue(),
-      plotData: {},
+      plotData: {'summary': {}},
     }
   },
   created () {
@@ -74,7 +73,9 @@ export default {
   },
   methods: {
     prepareData(filters) {
-      var newData = {}      
+      var newData = {}
+      var monteCarloSum = 0;
+      var rerecoSum = 0;
       for (let campaignName of filters.campaigns) {
         let campaignData = this.fetchedData.data[campaignName];
         let md5CampaignName = md5(campaignName);
@@ -83,11 +84,13 @@ export default {
         var campaign = {'name': campaignName,
                         'class': campaignClass,
                         'color': campaignColor,
-                        'values': new Array(this.fetchedData.timestamps.length - 1).fill(0)}
+                        'values': new Array(this.fetchedData.timestamps.length - 1).fill(0),
+                        'pwgs': []}
         for (let pwg of filters.pwgs) {
           if (!(pwg in campaignData)) {
             continue
           }
+          campaign['pwgs'].push(pwg);
           for (let blockName of filters.blocks) {
             if (!(blockName in campaignData[pwg])) {
               continue
@@ -99,11 +102,25 @@ export default {
         }
         campaign['sum'] = d3.sum(campaign.values);
         if (campaign['sum'] > 0) {
+          if (campaign['pwgs'].length === 1 && campaign['pwgs'][0].toLowerCase() === 'rereco') {
+            campaign['type'] = 'rereco'
+            rerecoSum += campaign['sum']
+          } else {
+            campaign['type'] = 'mc'
+            monteCarloSum += campaign['sum']
+          }
           campaign['niceSum'] = this.formatBigNumber(campaign['sum'])
           newData[campaignName] = campaign;
         }
       }
-      this.plotData = {'data': newData, 'timestamps': this.fetchedData.timestamps}
+      this.plotData = {'data': newData,
+                       'timestamps': this.fetchedData.timestamps,
+                       'summary': {'monteCarloSum': monteCarloSum,
+                                   'monteCarloNiceSum': this.formatBigNumber(monteCarloSum),
+                                   'rerecoSum': rerecoSum,
+                                   'rerecoNiceSum': this.formatBigNumber(rerecoSum),
+                                   'totalSum': monteCarloSum + rerecoSum,
+                                   'totalNiceSum': this.formatBigNumber(monteCarloSum + rerecoSum)}}
     },
     stringToColor(str) {
       var hash1 = 0;

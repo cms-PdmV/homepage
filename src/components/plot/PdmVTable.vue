@@ -1,7 +1,7 @@
 <template>
   <table style="width:100%" class="elevation-2">
     <tr>
-      <td>Campaign</td><td>Events</td><td>Campaign Links</td><td>McM Links</td>
+      <th>Campaign</th><th>Events</th><th>Campaign Links</th><th>McM Links</th>
     </tr>
     <tr v-for="campaignData in rows"
         :key="campaignData.name"
@@ -14,10 +14,22 @@
       <td><a target="_blank" :href="'https://cms-pdmv.cern.ch/pmp/historical?r=' + campaignData.name">pMp</a>&nbsp;
           <a target="_blank" :href="'https://twiki.cern.ch/twiki/bin/view/CMS/' + campaignData.name">TWiki</a></td>
       <td>
-        <span v-for="pwgName in campaignPwgs[campaignData.name]">
+        <span v-if="campaignData.data.type !== 'rereco'" v-for="pwgName in campaignData.data.pwgs">
           <a target="_blank" :href="'https://cms-pdmv.cern.ch/mcm/requests?member_of_campaign=' + campaignData.name + '&pwg=' + pwgName">{{pwgName}}</a>&nbsp;
         </span>
       </td>
+    </tr>
+    <tr style="opacity: 0.6" v-if="rows.length > 1 && plotData.summary.monteCarloSum > 0 && plotData.summary.rerecoSum > 0">
+      <td style="text-align: left; word-break: break-all;"><i>Total Monte Carlo</i></td>
+      <td style="text-align: right;"><b>{{plotData.summary.monteCarloNiceSum}}</b></td>
+    </tr>
+    <tr style="opacity: 0.6" v-if="rows.length > 1 && plotData.summary.monteCarloSum > 0 && plotData.summary.rerecoSum > 0">
+      <td style="text-align: left; word-break: break-all;"><i>Total Data ReReco</i></td>
+      <td style="text-align: right;"><b>{{plotData.summary.rerecoNiceSum}}</b></td>
+    </tr>
+    <tr style="opacity: 0.6" v-if="rows.length > 1 && (plotData.summary.monteCarloSum > 0 || plotData.summary.rerecoSum > 0)">
+      <td style="text-align: left; word-break: break-all;"><i>Total</i></td>
+      <td style="text-align: right;"><b>{{plotData.summary.totalNiceSum}}</b></td>
     </tr>
   </table>
 </template>
@@ -34,17 +46,12 @@
     data () {
       return {
         rows: [],
-        campaignPwgs: {},
         hoverCampaignClass: undefined,
         filterPwgs: [],
       }
     },
     props: {
       plotData: {
-        type: Object,
-        default: () => {}
-      },
-      fetchedData: {
         type: Object,
         default: () => {}
       },
@@ -72,9 +79,6 @@
         this.rows = [];
         for (let campaignName in this.plotData.data) {
           this.rows.push({'name': campaignName, 'data': this.plotData.data[campaignName]})
-        }
-        for (let campaignName in this.fetchedData.data) {
-          this.campaignPwgs[campaignName] = Object.keys(this.fetchedData.data[campaignName]).filter(el => this.filterPwgs.includes(el))
         }
         this.rows = this.rows.sort(function(a, b) { return a.data.sum > b.data.sum ? -1 : 1})
       }
