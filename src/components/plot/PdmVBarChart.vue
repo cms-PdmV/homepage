@@ -42,7 +42,7 @@
         points: [],
         // Color cache
         colors: {},
-        plotMode: 'change',
+        plotMode: 'cumulative',
         plotScale: 'linear',
         bubbleLegend: 'off'
       }

@@ -130,7 +130,7 @@ export default {
           selected: 0
         },
       },
-      plotMode: 'change',
+      plotMode: 'cumulative',
       plotScale: 'linear',
       bubbleLegend: 'off'
     }
