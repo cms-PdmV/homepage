@@ -24,6 +24,7 @@ def get_list_of_campaigns():
             print('Campaign %s does not have any submitted requests' % (campaign_prepid))
 
     rereco_campaigns = pmp._McM__get('api/objects?r=rereco_campaigns')
+    rereco_campaigns = [x for x in rereco_campaigns if 'nanoaod' not in x.lower()]
     campaigns_with_submitted_requests.extend(rereco_campaigns)
     return campaigns_with_submitted_requests
 
