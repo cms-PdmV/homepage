@@ -2,6 +2,7 @@
 node_modules
 /dist
 /public/file.json
+/python/__pycache__/*
 
 # local env files
 .env.local
