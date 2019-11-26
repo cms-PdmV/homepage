@@ -1,7 +1,7 @@
 <template>
   <table style="width:100%" class="elevation-2">
     <tr>
-      <th>Campaign</th><th>Events</th><th>Campaign Links</th><th>McM Links</th>
+      <th>Campaign</th><th>Events</th><th>pMp Links</th><th>McM Links</th>
     </tr>
     <tr v-for="campaignData in rows"
         :key="campaignData.name"
@@ -11,8 +11,9 @@
         v-bind:style="getRowStyle(campaignData)">
       <td style="text-align: left; word-break: break-all;" @mousedown="handleRowClick(campaignData)">{{campaignData.name}}</td>
       <td style="text-align: right;" @mousedown="handleRowClick(campaignData)" :title="campaignData.data.sum"><b>{{campaignData.data.niceSum}}</b></td>
-      <td><a target="_blank" :href="'https://cms-pdmv.cern.ch/pmp/historical?r=' + campaignData.name">pMp</a>&nbsp;
-          <a target="_blank" :href="'https://twiki.cern.ch/twiki/bin/view/CMS/' + campaignData.name">TWiki</a></td>
+      <td><a target="_blank" :href="'https://cms-pdmv.cern.ch/pmp/present?r=' + campaignData.name + '&growingMode=true&mode=events&groupBy='">Present</a>&nbsp;
+          <a target="_blank" :href="'https://cms-pdmv.cern.ch/pmp/historical?r=' + campaignData.name">Historical</a>
+      </td>
       <td>
         <span v-if="campaignData.data.type !== 'rereco'" v-for="pwgName in campaignData.data.pwgs">
           <a target="_blank" :href="'https://cms-pdmv.cern.ch/mcm/requests?member_of_campaign=' + campaignData.name + '&pwg=' + pwgName">{{pwgName}}</a>&nbsp;

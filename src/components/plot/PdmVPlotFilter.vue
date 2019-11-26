@@ -38,8 +38,9 @@
             :key="campaign.name"
             :label="campaign.name"
           ></v-checkbox>
-          <v-btn @click="setAll(dataFilters.campaigns, true)" class="mr-2">Select all</v-btn>
-          <v-btn @click="setAll(dataFilters.campaigns, false)">Deselect all</v-btn>
+          <v-btn @click="setAll(dataFilters.campaigns, true)" class="mr-2 mt-2">Select all</v-btn>
+          <v-btn @click="setAll(dataFilters.campaigns, false)" class="mr-2 mt-2">Deselect all</v-btn>
+          <v-btn @click="invert(dataFilters.campaigns)" class="mt-2">Invert all</v-btn>
         </v-expansion-panel-content>
       </v-expansion-panel>
 
@@ -151,7 +152,7 @@ export default {
   mounted () {
     let component = this
     this.eventBus.$on('campaignClick', function (campaign) {
-      var onlyCurrentSelected = component.dataFilters.campaigns.reduce(function(res, c) {return res && ((c.name === campaign.name) == (c.selected))}, true)
+      let onlyCurrentSelected = component.dataFilters.campaigns.reduce(function(res, c) {return res && ((c.name === campaign.name) == (c.selected))}, true)
       component.dataFilters.campaigns.map(function(c) {c.selected = (c.name === campaign.name) || onlyCurrentSelected})
     })
   },
@@ -211,8 +212,28 @@ export default {
       newFilters.pwgs = []
       if (this.fetchedData) {
         for (let campaignName in this.fetchedData.data) {
-          newFilters.campaigns.push({'name': campaignName, 'selected': true});
+          newFilters.campaigns.push({'name': campaignName, 'selected': campaignName.toLowerCase().indexOf('nano') === -1});
         }
+        let compare = function(a, b) {
+          let aName = a.name.toLowerCase();
+          let bName = b.name.toLowerCase();
+          let aNano = aName.indexOf('nano') !== -1;
+          let bNano = bName.indexOf('nano') !== -1;
+          if (!aNano && bNano) {
+            return -1;
+          }
+          if (aNano && !bNano) {
+            return 1;
+          }
+          if (aName < bName) {
+            return -1;
+          }
+          if  (aName > bName) {
+            return 1;
+          }
+          return 0;
+        }
+        newFilters.campaigns = newFilters.campaigns.sort(compare)
         let availableBlocks = [{'name': 'block1', 'displayName': 'Block 1 (110k)', 'selected': true},
                                {'name': 'block2', 'displayName': 'Block 2 (90k)','selected': true},
                                {'name': 'block3', 'displayName': 'Block 3 (85k)','selected': true},
@@ -233,6 +254,11 @@ export default {
     setAll(objects, value) {
       for (let key of Object.keys(objects)) {
         objects[key].selected = value;
+      }
+    },
+    invert(objects) {
+      for (let key of Object.keys(objects)) {
+        objects[key].selected = !objects[key].selected;
       }
     }
   }

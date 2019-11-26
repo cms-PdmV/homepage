@@ -1,4 +1,3 @@
-import sys
 import json
 import time
 import os
@@ -6,16 +5,18 @@ import os
 from rest import McM
 
 
-mcm = McM(dev=False, debug=True, cookie=os.getenv('PROD_COOKIE'))
-pmp = McM(dev=False, debug=True, cookie=os.getenv('PROD_COOKIE'))
+mcm = McM(dev=False, cookie=os.getenv('PROD_COOKIE'))
+pmp = McM(dev=False, cookie=os.getenv('PROD_COOKIE'))
 pmp.server = pmp.server.replace('mcm', 'pmp')
 
 
 def get_list_of_campaigns():
-    campaigns = mcm.get('campaigns', query='prepid=*MiniAOD*&status=started')
-    print('%s MiniAOD started campaigns' % (len(campaigns)))
+    mc_mini_campaigns = mcm.get('campaigns', query='prepid=*MiniAOD*&status=started')
+    mc_nano_campaigns = mcm.get('campaigns', query='prepid=*NanoAOD*&status=started')
+    print('%s MiniAOD started campaigns' % (len(mc_mini_campaigns)))
+    print('%s NanoAOD started campaigns' % (len(mc_nano_campaigns)))
     campaigns_with_submitted_requests = []
-    for campaign in campaigns:
+    for campaign in mc_mini_campaigns + mc_nano_campaigns:
         campaign_prepid = campaign['prepid']
         requests = mcm.get('requests', query='member_of_campaign=%s&status=submitted' % (campaign_prepid), page=0)
         if len(requests) > 0:
@@ -24,7 +25,7 @@ def get_list_of_campaigns():
             print('Campaign %s does not have any submitted requests' % (campaign_prepid))
 
     rereco_campaigns = pmp._McM__get('api/objects?r=rereco_campaigns')
-    rereco_campaigns = [x for x in rereco_campaigns if 'nanoaod' not in x.lower()]
+    print('%s ReReco campaigns' % (len(rereco_campaigns)))
     campaigns_with_submitted_requests.extend(rereco_campaigns)
     return campaigns_with_submitted_requests
 
@@ -72,7 +73,7 @@ campaign_list = get_list_of_campaigns()
 for i, campaign in enumerate(campaign_list):
     print('Getting %s from pMp, %s/%s' % (campaign, i + 1, len(campaign_list)))
     campaigns[campaign] = {}
-    campaign_results = pmp._McM__get('api/historical?r=%s&granularity=20' % (campaign))
+    campaign_results = pmp._McM__get('api/historical?r=%s&granularity=3' % (campaign))
     if len(campaign_results['results']['submitted_requests']) == 0:
         print('Skipping %s because no submitted requests' % (campaign))
         continue
@@ -89,9 +90,10 @@ for i, campaign in enumerate(campaign_list):
                                                                                                                             pwg))['results']['data']
 
 print('Got %s campaigns' % (len(campaigns)))
-now = int(time.time())
-step = 3600 * 8 # 8 hours
-past = now - 3600 * 24 * 7 - step
+# Round down to 8 hours
+step = 3600 * 8  # 8 hours
+now = int((time.time() + 3600) / step) * step - 3600
+past = now - 3600 * 24 * 7
 timestamps = list(range(past * 1000, now * 1000, step * 1000))
 # if timestamps[-1] != now:
 #     timestamps[-1] = now * 1000

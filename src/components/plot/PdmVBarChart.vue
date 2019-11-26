@@ -70,14 +70,17 @@
         this.points = [];
         // Number of histogram bars
         let numberOfBars = this.plotData.timestamps.length - 1;
+        // Sort campaigns by their sum
+        let data = this.plotData.data;
+        let campaignNames = Object.keys(data).sort(function(a, b) { return data[a].sum - data[b].sum;})
         // Make a list of objects that each represent one piece of a bar
         for (let i = 0; i < numberOfBars; i++) {
           var startY = 0.1;
-          for (let campaignName in this.plotData.data) {
-            let value = this.plotData.data[campaignName]['values'][i]
+          for (let campaignName of campaignNames) {
+            let value = data[campaignName]['values'][i]
             if (this.plotMode === 'cumulative') {
               for (let j = 0; j < i; j++) {
-                value += this.plotData.data[campaignName]['values'][j];
+                value += data[campaignName]['values'][j];
               }
             }
             if (value > 0) {
@@ -86,8 +89,8 @@
                                  'start': startY,
                                  'end': startY + value,
                                  'column': i,
-                                 'color': this.plotData.data[campaignName]['color'],
-                                 'class': this.plotData.data[campaignName]['class']};
+                                 'color': data[campaignName]['color'],
+                                 'class': data[campaignName]['class']};
               startY += value;
               this.points.push(campaignBar);
             }
@@ -152,7 +155,7 @@
 
       formatTimestamp (data, index) {
         let datetime = new Date(this.plotData.timestamps[index]);
-        return dateFormat(datetime, 'mmm dd, HH:MM');
+        return dateFormat(datetime, 'mmm dd, HH') + 'h';
       },
 
       /**
@@ -263,6 +266,10 @@
             campaignColors.push(item)
           }
           campaignColors.sort(function(a, b) { return a.sum > b.sum ? -1 : 1})
+          if (campaignColors.length > 18) {
+            // Take first 18 elements
+            campaignColors = campaignColors.slice(0, 18);
+          }
           for (let item of campaignColors) {
             item['y'] = legendCircleY;
             legendCircleY += 18;

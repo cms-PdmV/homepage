@@ -28,6 +28,7 @@
         </div>
       </v-col>
     </v-row>
+    <small style="opacity: 0.4">Only MiniAOD and NanoAOD Monte Carlo campaigns that have status "started" and have at least one submitted request and ReReco campaigns that have at least one submitted request are shown in above table and plot</small>
   </div>
 </template>
 

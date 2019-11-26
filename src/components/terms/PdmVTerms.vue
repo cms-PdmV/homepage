@@ -11,6 +11,7 @@
               <li><a target="_blank" :href="'https://monte-carlo-production-tools.gitbook.io/project/analyzers-corner'">MC analyzer's corner</a> - basic explanation of the glossary, needed for analysers to understand the logic of the central MC production</li>
             </ul>
           </li>
+          <li><a target="_blank" :href="'https://twiki.cern.ch/twiki/bin/view/CMS/PdmVMcCampaigns  '">Campaigns TWiki</a> - Monte Carlo campaigns TWiki</li>        
           <li><a target="_blank" :href="'https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVAnalysisSummaryTable'">Analysis Table</a> - analysis guideline</li>
           <li><a target="_blank" :href="'https://hypernews.cern.ch/HyperNews/CMS/get/prep-ops.html'">MC HyperNews</a> - forum dedicated to the discussion and advertisement of requests managed within the McM</li>
         </ul>
