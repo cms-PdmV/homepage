@@ -10,6 +10,7 @@
         text
         href="https://cms-pdmv.cern.ch/mcm"
         target="_blank"
+        class="d-none d-md-flex"
       >
         <span class="mr-2">McM</span>
         <v-icon>mdi-open-in-new</v-icon>
@@ -18,6 +19,7 @@
         text
         href="https://cms-pdmv.cern.ch/pmp"
         target="_blank"
+        class="d-none d-md-flex"
       >
         <span class="mr-2">pMp</span>
         <v-icon>mdi-open-in-new</v-icon>
@@ -26,6 +28,7 @@
         text
         href="https://hypernews.cern.ch/HyperNews/CMS/get/prep-ops.html"
         target="_blank"
+        class="d-none d-md-flex"
       >
         <span class="mr-2">HyperNews</span>
         <v-icon>mdi-open-in-new</v-icon>
@@ -34,6 +37,7 @@
         text
         href="https://cms-pdmv.cern.ch/valdb"
         target="_blank"
+        class="d-none d-md-flex"
       >
         <span class="mr-2">ValDB</span>
         <v-icon>mdi-open-in-new</v-icon>
@@ -42,6 +46,7 @@
         text
         href="https://cms-pdmv.cern.ch/relmon"
         target="_blank"
+        class="d-none d-md-flex"
       >
         <span class="mr-2">RelMon</span>
         <v-icon>mdi-open-in-new</v-icon>

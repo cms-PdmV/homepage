@@ -1,6 +1,7 @@
 import json
 import time
 import os
+import datetime
 # sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
 from rest import McM
 
@@ -11,18 +12,14 @@ pmp.server = pmp.server.replace('mcm', 'pmp')
 
 
 def get_list_of_campaigns():
-    mc_mini_campaigns = mcm.get('campaigns', query='prepid=*MiniAOD*&status=started')
-    mc_nano_campaigns = mcm.get('campaigns', query='prepid=*NanoAOD*&status=started')
+    mc_mini_campaigns = mcm.get('campaigns', query='prepid=*MiniAOD*')
+    mc_nano_campaigns = mcm.get('campaigns', query='prepid=*NanoAOD*')
     print('%s MiniAOD started campaigns' % (len(mc_mini_campaigns)))
     print('%s NanoAOD started campaigns' % (len(mc_nano_campaigns)))
     campaigns_with_submitted_requests = []
     for campaign in mc_mini_campaigns + mc_nano_campaigns:
         campaign_prepid = campaign['prepid']
-        requests = mcm.get('requests', query='member_of_campaign=%s&status=submitted' % (campaign_prepid), page=0)
-        if len(requests) > 0:
-            campaigns_with_submitted_requests.append(campaign_prepid)
-        else:
-            print('Campaign %s does not have any submitted requests' % (campaign_prepid))
+        campaigns_with_submitted_requests.append(campaign_prepid)
 
     rereco_campaigns = pmp._McM__get('api/objects?r=rereco_campaigns')
     print('%s ReReco campaigns' % (len(rereco_campaigns)))
@@ -58,6 +55,65 @@ def aggregate_data_points(data, timestamps):
     return points
 
 
+def get_week_timestamps():
+    # Last week, per 8 hour timestamp
+    # Round down to 8 hours
+    step = 3600 * 8  # 8 hours
+    now = int(1 + (time.time() + 3600) / step) * step - 3600
+    past = now - 3600 * 24 * 7
+    timestamps = list(range(past, now, step))
+    timestamps.append(now)
+    return timestamps
+
+
+def get_month_timestamps():
+    # Last 30 days, per day timestamp
+    step = 3600 * 24  # 24 hours
+    now = (1 + int((time.time() + 3600) / step)) * step - 3600
+    past = now - 3600 * 24 * 30
+    timestamps = list(range(past, now, step))
+    timestamps.append(now)
+    return timestamps
+
+
+def get_quarter_timestamps():
+    # Last 12 weeks, per week timestamp
+    now = datetime.date.today()
+    now -= datetime.timedelta(days=now.weekday())
+    now += datetime.timedelta(weeks=1)  # Next Monday
+    now = datetime.datetime(now.year, now.month, now.day)
+    timestamps = []
+    for i in range(0, 13):
+        timestamps.append(datetime.datetime.timestamp(now - datetime.timedelta(weeks=i)))
+
+    timestamps.sort()
+    return timestamps
+
+
+def get_year_timestamps():
+    def add_month(dt):
+        return datetime.datetime(dt.year if dt.month <= 11 else dt.year + 1,
+                                 (dt.month + 1) if dt.month <= 11 else 1,
+                                 dt.day)
+
+    def subtract_month(dt):
+        return datetime.datetime(dt.year if dt.month > 1 else dt.year - 1,
+                                 (dt.month - 1) if dt.month > 1 else 12,
+                                 dt.day)
+
+    # Last 12 months, per month timestamp
+    now = datetime.date.today()
+    now = datetime.datetime(now.year, now.month, 1)  # Beginning of this month
+    now = add_month(now)
+    timestamps = []
+    for i in range(0, 13):
+        timestamps.append(datetime.datetime.timestamp(now))
+        now = subtract_month(now)
+
+    timestamps.sort()
+    return timestamps
+
+
 granularity = 500
 priority_blocks = {
     'block1': '110000,',
@@ -90,48 +146,45 @@ for i, campaign in enumerate(campaign_list):
                                                                                                                             pwg))['results']['data']
 
 print('Got %s campaigns' % (len(campaigns)))
-# Round down to 8 hours
-step = 3600 * 8  # 8 hours
-now = int((time.time() + 3600) / step) * step - 3600
-past = now - 3600 * 24 * 7
-timestamps = list(range(past * 1000, now * 1000, step * 1000))
-# if timestamps[-1] != now:
-#     timestamps[-1] = now * 1000
-timestamps.append(now * 1000)
+all_timestamps = {}
 
-print('Timestamps up to now %s' % (', '.join([str(x) for x in timestamps])))
+all_timestamps['week'] = get_week_timestamps()
+all_timestamps['30_days'] = get_month_timestamps()
+all_timestamps['12_weeks'] = get_quarter_timestamps()
+all_timestamps['12_months'] = get_year_timestamps()
 
-# Split all campaigns into nice equal timestamps
-changes = {}
-used_pwgs = set()
-used_blocks = set()
-for campaign_name in campaigns:
-    for pwg in campaigns[campaign_name]:
-        for block_name in campaigns[campaign_name][pwg]:
-            block = aggregate_data_points({campaign_name: campaigns[campaign_name][pwg][block_name]}, timestamps)
-            block = [x['change'] for x in block]
-            block = block[1:]
-            block_sum = sum(block)
-            if block_sum > 0:
-                if campaign_name not in changes:
-                    changes[campaign_name] = {}
+for timestamp_name, timestamps in all_timestamps.items():
+    # Split all campaigns into nice equal timestamps
+    changes = {}
+    used_pwgs = set()
+    used_blocks = set()
+    timestamps = [x * 1000 for x in timestamps]
+    for campaign_name in campaigns:
+        for pwg in campaigns[campaign_name]:
+            for block_name in campaigns[campaign_name][pwg]:
+                block = aggregate_data_points({campaign_name: campaigns[campaign_name][pwg][block_name]}, timestamps)
+                block = [x['change'] for x in block]
+                block = block[1:]
+                block_sum = sum(block)
+                if block_sum > 0:
+                    if campaign_name not in changes:
+                        changes[campaign_name] = {}
 
-                if pwg not in changes[campaign_name]:
-                    changes[campaign_name][pwg] = {}
+                    if pwg not in changes[campaign_name]:
+                        changes[campaign_name][pwg] = {}
 
-                changes[campaign_name][pwg][block_name] = block
-                used_pwgs.add(pwg)
-                used_blocks.add(block_name)
+                    changes[campaign_name][pwg][block_name] = block
+                    used_pwgs.add(pwg)
+                    used_blocks.add(block_name)
 
+    changes = {'timestamps': timestamps,
+               'data': changes,
+               'pwgs': sorted(list(used_pwgs)),
+               'blocks': sorted(list(used_blocks))}
 
-changes = {'timestamps': timestamps,
-           'data': changes,
-           'pwgs': sorted(list(used_pwgs)),
-           'blocks': sorted(list(used_blocks))}
-
-# print(json.dumps(changes, indent=4))
-if len(changes) > 0:
-    f = open('file.json', 'w')
-    json.dump(changes, f)
-else:
-    print('No results?')
+    # print(json.dumps(changes, indent=4))
+    if len(changes) > 0:
+        f = open(f'{timestamp_name}.json', 'w')
+        json.dump(changes, f)
+    else:
+        print('No results?')

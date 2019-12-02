@@ -44,7 +44,8 @@
         colors: {},
         plotMode: 'cumulative',
         plotScale: 'linear',
-        bubbleLegend: 'off'
+        bubbleLegend: 'off',
+        timeRange: 'week'
       }
     },
 
@@ -103,7 +104,7 @@
       scaleChange(newScale) {
         this.plotScale = newScale;
         let maxValue = d3.max(this.points, function(e) { return e.start + e.value})
-        this.axis.x = d3.scaleLinear().range([0, CHART.width - (this.bubbleLegend === 'on' ? WRAPPER.padding.bubbleLegend : 0)]).domain([0, (this.plotData.timestamps.length + 0.3 - 1)]);
+        this.axis.x = d3.scaleLinear().range([0, CHART.width - (this.bubbleLegend === 'on' ? WRAPPER.padding.bubbleLegend : 0)]).domain([0, (this.plotData.timestamps.length - 1)]);
         this.axis.xAxis = d3.axisBottom(this.axis.x).ticks(this.plotData.timestamps.length).tickFormat(this.formatTimestamp);
         this.axis.xAxis.scale(this.axis.x);
 
@@ -155,7 +156,11 @@
 
       formatTimestamp (data, index) {
         let datetime = new Date(this.plotData.timestamps[index]);
-        return dateFormat(datetime, 'mmm dd, HH') + 'h';
+        if (this.timeRange == 'week') {
+          return dateFormat(datetime, 'mmm dS, HH') + 'h';
+        } else {
+          return dateFormat(datetime, 'mmm dS, yyyy');
+        }
       },
 
       /**
@@ -172,7 +177,6 @@
 
         let y0 = y(0.1);
         let x005 = x(0.05);
-        let x03 = x(0.4);
 
         if (!previousWasEmpty) {
           chart.selectAll('rect.bar').transition()
@@ -181,7 +185,7 @@
                .ease(d3.easeQuadIn)
                .attr('height', function(d) { return 0 })
                .attr('transform', function(d) {
-                 return 'translate(' + (x(d.column) + x03 + x005) + ',' + (WRAPPER.padding.top + y0) + ')';
+                 return 'translate(' + (x(d.column) + x005) + ',' + (WRAPPER.padding.top + y0) + ')';
                })
                .remove()
 
@@ -218,7 +222,7 @@
              .style('opacity', 1)
              .attr('fill', function(d) { return d.color; })
              .attr('transform', function(d) {
-               return 'translate(' + (x(d.column) + x03 + x005) + ',' + (WRAPPER.padding.top + y0) + ')';
+               return 'translate(' + (x(d.column) + x005) + ',' + (WRAPPER.padding.top + y0) + ')';
              })
              .attr('width', function(d) { return x(0.9) })
              .attr('height', function(d) { return 0})
@@ -248,7 +252,7 @@
              .ease(d3.easeBackOut.overshoot(1.7))
              .attr('height', function(d) { return y(d.start) - y(d.end) })
              .attr('transform', function(d) {
-               return 'translate(' + (x(d.column) + x03 + x005) + ',' + (WRAPPER.padding.top + y(d.end)) + ')';
+               return 'translate(' + (x(d.column) + x005) + ',' + (WRAPPER.padding.top + y(d.end)) + ')';
              })
 
         if (this.bubbleLegend === 'on') {
@@ -385,16 +389,16 @@
 
       this.plot.chart.append('svg:g')
                      .attr('class', 'x axis')
-                     .attr('transform', 'translate(15,' + (WRAPPER.padding.top + CHART.height) + ')')
+                     .attr('transform', 'translate(0,' + (WRAPPER.padding.top + CHART.height) + ')')
 
       this.plot.chart.append('svg:g')
                      .attr('class', 'y axis')
-                     .attr('transform', 'translate(0,' + WRAPPER.padding.top + ')')
+                     .attr('transform', 'translate(-10,' + WRAPPER.padding.top + ')')
 
       this.plot.chart.append("text")
                      .text('EVENTS')
                      .attr("class", "y-label")
-                     .attr("transform", "rotate(-90) translate(-"+WRAPPER.padding.top+", 14)")
+                     .attr("transform", "rotate(-90) translate(-"+WRAPPER.padding.top+", 2)")
 
       let component = this;
       this.eventBus.$on('campaignHover', function(campaign) {
@@ -417,6 +421,9 @@
       this.eventBus.$on('bubbleLegendChange', function(bubbleLegend) {
         component.bubbleLegend = bubbleLegend;
         component.draw(component.points.length === 0)
+      })
+      this.eventBus.$on('timeRangeChange', function(timeRange) {
+        component.timeRange = timeRange;
       })
     }
 };
@@ -447,7 +454,7 @@
     left: -50%;
     padding: 8px 4px;
     border-radius: 5px;
-    background: #2e6da4;
+    background: #1976D2;
     text-align: center;
     color: white;
     font-family: Roboto;

@@ -3,7 +3,7 @@
     <v-container>
       <v-row>
         <v-col cols="12">
-          <PdmVPlot :fetchedData="fetchedData"></PdmVPlot>
+          <PdmVPlot></PdmVPlot>
         </v-col>
       </v-row>
       <v-row>
@@ -23,19 +23,15 @@
 import PdmVPlot from './plot/PdmVPlot.vue'
 import PdmVHierarchy from './hierarchy/PdmVHierarchy.vue'
 import PdmVTerms from './terms/PdmVTerms.vue'
-import axios from 'axios'
 
 export default {
   name: 'MainComponent',
   data () {
     return {
-      fetchedData: {}
     }
   },
   created () {
-    axios.get('file.json').then(response => {
-      this.fetchedData = response.data;
-    });
+
   },
   watch: {
 
@@ -51,6 +47,22 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
+
+@media only screen and (max-width: 600px) {
+  .row > div {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .container {
+    padding: 0;
+  }
+
+  .row {
+    margin-right: 0;
+    margin-left: 0;
+  }
+}
 
 </style>

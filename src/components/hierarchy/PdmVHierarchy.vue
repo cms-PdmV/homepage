@@ -2,7 +2,9 @@
   <div style="background: white;" class="pa-2 elevation-3">
     <h1 class="ml-2">PdmV Organigram</h1>
     <div style="text-align: center;">
-      <img :src="'hierarchy.png'">
+      <a href="hierarchy.png">
+        <img :src="'hierarchy.png'">
+      </a>
     </div>
   </div>
 </template>

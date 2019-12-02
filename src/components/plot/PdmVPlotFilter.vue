@@ -10,13 +10,14 @@
           </span>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
-          <v-checkbox
-            class="nomargin"
-            v-for="block in dataFilters.blocks"
-            v-model="block.selected"
-            :key="block.name"
-            :label="block.displayName"
-          ></v-checkbox>
+          <span v-for="block in dataFilters.blocks" :title="block.title">
+            <v-checkbox
+              class="nomargin"
+              v-model="block.selected"
+              :key="block.name"
+              :label="block.displayName"
+            ></v-checkbox>
+          </span>
           <v-btn @click="setAll(dataFilters.blocks, true)" class="mr-2">Select all</v-btn>
           <v-btn @click="setAll(dataFilters.blocks, false)">Deselect all</v-btn>
         </v-expansion-panel-content>
@@ -75,8 +76,12 @@
         <v-expansion-panel-header>Plot Mode</v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-radio-group v-model="plotMode" class="nomargin">
-            <v-radio :key="'change'" :label="'Newly produced'" :value="'change'"></v-radio>
-            <v-radio :key="'cumulative'" :label="'Cumulative'" :value="'cumulative'"></v-radio>
+            <span title="Bars represent how many events in total were producted up to the end of that time slot">
+              <v-radio :key="'cumulative'" :label="'Cumulative'" :value="'cumulative'"></v-radio>
+            </span>
+            <span title="Bars represent how many events were produced in that time slot">
+              <v-radio :key="'change'" :label="'Newly produced'" :value="'change'"></v-radio>
+            </span>
           </v-radio-group>
         </v-expansion-panel-content>
       </v-expansion-panel>
@@ -85,8 +90,12 @@
         <v-expansion-panel-header>Plot Scale</v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-radio-group v-model="plotScale" class="nomargin">
-            <v-radio :key="'linear'" :label="'Linear'" :value="'linear'"></v-radio>
-            <v-radio :key="'log'" :label="'Logarithmic'" :value="'log'"></v-radio>
+            <span title="Make event axis linear">
+              <v-radio :key="'linear'" :label="'Linear'" :value="'linear'"></v-radio>
+            </span>
+            <span title="Make event axis logarithmic">
+              <v-radio :key="'log'" :label="'Logarithmic'" :value="'log'"></v-radio>
+            </span>
           </v-radio-group>
         </v-expansion-panel-content>
       </v-expansion-panel>
@@ -95,9 +104,34 @@
         <v-expansion-panel-header>Bubble Legend</v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-radio-group v-model="bubbleLegend" class="nomargin">
-            <v-radio :key="'off'" :label="'Hidden'" :value="'off'"></v-radio>
-            <v-radio :key="'on'" :label="'Visible'" :value="'on'"></v-radio>
+            <span title="Hide color legend next to the plot">
+              <v-radio :key="'off'" :label="'Hidden'" :value="'off'"></v-radio>
+            </span>
+            <span title="Show color legent next to the plot">
+              <v-radio :key="'on'" :label="'Visible'" :value="'on'"></v-radio>
+            </span>
           </v-radio-group>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+
+      <v-expansion-panel>
+        <v-expansion-panel-header>Time Range</v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-radio-group v-model="timeRange" class="nomargin">
+            <span title="Show last 7 days in 8 hour intervals">
+              <v-radio :key="'week'" :label="'7 days'" :value="'week'"></v-radio>
+            </span>
+            <span title="Show last 30 days in 1 day intervals">
+              <v-radio :key="'30_days'" :label="'30 days'" :value="'30_days'"></v-radio>
+            </span>
+            <span title="Show last 12 weeks in 1 week intervals">
+              <v-radio :key="'12_weeks'" :label="'12 weeks'" :value="'12_weeks'"></v-radio>
+            </span>
+            <span title="Show last 12 months in 1 month intervals">
+              <v-radio :key="'12_months'" :label="'12 months'" :value="'12_months'"></v-radio>
+            </span>
+          </v-radio-group>
+          <small style="opacity: 0.4">Changing time range will reset priority, campaign and PWG filters</small>
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-expansion-panels>
@@ -133,7 +167,8 @@ export default {
       },
       plotMode: 'cumulative',
       plotScale: 'linear',
-      bubbleLegend: 'off'
+      bubbleLegend: 'off',
+      timeRange: 'week'
     }
   },
   created () {
@@ -203,6 +238,9 @@ export default {
     bubbleLegend () {
       this.eventBus.$emit('bubbleLegendChange', this.bubbleLegend)
     },
+    timeRange () {
+      this.eventBus.$emit('timeRangeChange', this.timeRange)
+    },
   },
   methods: {
     prepareFilters() {
@@ -234,12 +272,12 @@ export default {
           return 0;
         }
         newFilters.campaigns = newFilters.campaigns.sort(compare)
-        let availableBlocks = [{'name': 'block1', 'displayName': 'Block 1 (110k)', 'selected': true},
-                               {'name': 'block2', 'displayName': 'Block 2 (90k)','selected': true},
-                               {'name': 'block3', 'displayName': 'Block 3 (85k)','selected': true},
-                               {'name': 'block4', 'displayName': 'Block 4 (80k)','selected': true},
-                               {'name': 'block5', 'displayName': 'Block 5 (70k)','selected': true},
-                               {'name': 'block6', 'displayName': 'Block 6 (63k)','selected': true},];
+        let availableBlocks = [{'name': 'block1', 'displayName': 'Block 1 (110k)', 'selected': true, 'title': 'Priority ⩾ 110000'},
+                               {'name': 'block2', 'displayName': 'Block 2 (90k)','selected': true, 'title': 'Priority 90000 - 109999'},
+                               {'name': 'block3', 'displayName': 'Block 3 (85k)','selected': true, 'title': 'Priority 85000 - 89999'},
+                               {'name': 'block4', 'displayName': 'Block 4 (80k)','selected': true, 'title': 'Priority 80000 - 84999'},
+                               {'name': 'block5', 'displayName': 'Block 5 (70k)','selected': true, 'title': 'Priority 70000 - 79999'},
+                               {'name': 'block6', 'displayName': 'Block 6 (63k)','selected': true, 'title': 'Priority ⩽ 69999'},];
         for (let availableBlock of availableBlocks) {
           if (this.fetchedData.blocks.includes(availableBlock.name)) {
             newFilters.blocks.push(availableBlock);
@@ -270,6 +308,10 @@ export default {
 .nomargin {
   margin: 0 !important;
   padding: 0 !important;
+}
+
+.v-input--radio-group__input > span {
+  padding-bottom: 8px;
 }
 
 .v-input__slot {

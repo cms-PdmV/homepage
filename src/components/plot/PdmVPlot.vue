@@ -28,7 +28,7 @@
         </div>
       </v-col>
     </v-row>
-    <small style="opacity: 0.4">Only MiniAOD and NanoAOD Monte Carlo campaigns that have status "started" and have at least one submitted request and ReReco campaigns that have at least one submitted request are shown in above table and plot</small>
+    <small style="opacity: 0.4">For Monte Carlo production, only MiniAOD and NanoAOD campaigns are shown</small>
   </div>
 </template>
 
@@ -40,6 +40,7 @@ import PdmVTable from './PdmVTable.vue'
 import PdmVPlotFilter from './PdmVPlotFilter.vue'
 import md5 from 'js-md5'
 import Vue from 'vue'
+import axios from 'axios'
 
 
 export default {
@@ -47,22 +48,23 @@ export default {
   data () {
     return {
       bus: new Vue(),
+      fetchedData: {},
       plotData: {'summary': {}},
     }
   },
   created () {
+    this.fetchData();
   },
   mounted () {
     let component = this
     this.bus.$on('filterChange', function (filters) {
       component.prepareData(filters)
     })
+    this.bus.$on('timeRangeChange', function (timeRange) {
+      component.fetchData(timeRange);
+    })
   },
   props: {
-    fetchedData: {
-      type: Object,
-      default: () => {}
-    }
   },
   watch: {
 
@@ -73,6 +75,15 @@ export default {
     PdmVPlotFilter
   },
   methods: {
+    fetchData(timeRange) {
+      let component = this;
+      if (timeRange === undefined) {
+        timeRange = 'week';
+      }
+      axios.get(timeRange + '.json').then(response => {
+        component.fetchedData = response.data;
+      });
+    },
     prepareData(filters) {
       var newData = {}
       var monteCarloSum = 0;
