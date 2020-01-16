@@ -130,6 +130,9 @@
             <span title="Show last 12 months in 1 month intervals">
               <v-radio :key="'12_months'" :label="'12 months'" :value="'12_months'"></v-radio>
             </span>
+            <span title="Show 2019 in 1 month intervals">
+              <v-radio :key="'2019_monthly'" :label="'2019 monthly'" :value="'2019_monthly'"></v-radio>
+            </span>
           </v-radio-group>
           <small style="opacity: 0.4">Changing time range will reset priority, campaign and PWG filters</small>
         </v-expansion-panel-content>

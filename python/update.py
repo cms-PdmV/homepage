@@ -90,7 +90,7 @@ def get_quarter_timestamps():
     return timestamps
 
 
-def get_year_timestamps():
+def get_year_timestamps(year=None):
     def add_month(dt):
         return datetime.datetime(dt.year if dt.month <= 11 else dt.year + 1,
                                  (dt.month + 1) if dt.month <= 11 else 1,
@@ -101,9 +101,13 @@ def get_year_timestamps():
                                  (dt.month - 1) if dt.month > 1 else 12,
                                  dt.day)
 
-    # Last 12 months, per month timestamp
-    now = datetime.date.today()
-    now = datetime.datetime(now.year, now.month, 1)  # Beginning of this month
+    if year is None:
+        # Last 12 months, per month timestamp
+        now = datetime.date.today()
+        now = datetime.datetime(now.year, now.month, 1)  # Beginning of this month
+    else:
+        now = datetime.datetime(year, 12, 1)
+
     now = add_month(now)
     timestamps = []
     for i in range(0, 13):
@@ -152,6 +156,7 @@ all_timestamps['week'] = get_week_timestamps()
 all_timestamps['30_days'] = get_month_timestamps()
 all_timestamps['12_weeks'] = get_quarter_timestamps()
 all_timestamps['12_months'] = get_year_timestamps()
+all_timestamps['2019_monthly'] = get_year_timestamps(2019)
 
 for timestamp_name, timestamps in all_timestamps.items():
     # Split all campaigns into nice equal timestamps
