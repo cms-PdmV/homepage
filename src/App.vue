@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar app>
+    <v-app-bar app style="background-color: #fff">
       <v-toolbar-title class="headline">
         <span>PdmV</span>
         <span class="font-weight-light">Homepage</span>
