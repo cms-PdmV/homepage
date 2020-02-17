@@ -134,10 +134,6 @@ for i, campaign in enumerate(campaign_list):
     print('Getting %s from pMp, %s/%s' % (campaign, i + 1, len(campaign_list)))
     campaigns[campaign] = {}
     campaign_results = pmp._McM__get('api/historical?r=%s&granularity=3' % (campaign))
-    if len(campaign_results['results']['submitted_requests']) == 0:
-        print('Skipping %s because no submitted requests' % (campaign))
-        continue
-
     pwgs = campaign_results['results']['pwg'].keys()
     print('Got %s pwgs for %s' % (len(pwgs), campaign))
     for pwg in pwgs:
