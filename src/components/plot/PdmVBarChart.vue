@@ -191,6 +191,7 @@
 
         }
         chart.selectAll('.legend.bar').remove()
+        chart.selectAll('.grayline').remove()
 
         let component = this;
         let tooltip = this.plot.tooltip;
@@ -212,6 +213,18 @@
         if (this.points.length == 0) {
           return;
         }
+
+        // Draw gray lines
+        chart.selectAll('line .grayline')
+             .data(this.axis.yAxis.scale().ticks().filter(Boolean))
+             .enter()
+             .append('line')
+             .attr('class', 'grayline')
+             .attr('x1', 0)
+             .attr('y1', function(d) { return WRAPPER.padding.top + y(d) })
+             .attr('x2', CHART.width - (this.bubbleLegend === 'on' ? WRAPPER.padding.bubbleLegend : 0))
+             .attr('y2', function(d) { return WRAPPER.padding.top + y(d) })
+
         // All rects that have bar class
         chart.selectAll('rect .bar')
              .data(this.points)
@@ -476,6 +489,11 @@
     cursor: auto;
     fill: rgba(0, 0, 0, 0.6);
     font-style: italic;
+  }
+
+  .grayline {
+    stroke: rgba(0, 0, 0, 0.075);
+    stroke-width: 1;
   }
 
   @media only screen and (max-width: 600px) {

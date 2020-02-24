@@ -18,8 +18,8 @@
               :label="block.displayName"
             ></v-checkbox>
           </span>
-          <v-btn @click="setAll(dataFilters.blocks, true)" class="mr-2">Select all</v-btn>
-          <v-btn @click="setAll(dataFilters.blocks, false)">Deselect all</v-btn>
+          <v-btn small @click="setAll(dataFilters.blocks, true)" class="mr-2 primary">Select all</v-btn>
+          <v-btn small @click="setAll(dataFilters.blocks, false)" class="primary">Deselect all</v-btn>
         </v-expansion-panel-content>
       </v-expansion-panel>
 
@@ -39,9 +39,10 @@
             :key="campaign.name"
             :label="campaign.name"
           ></v-checkbox>
-          <v-btn @click="setAll(dataFilters.campaigns, true)" class="mr-2 mt-2">Select all</v-btn>
-          <v-btn @click="setAll(dataFilters.campaigns, false)" class="mr-2 mt-2">Deselect all</v-btn>
-          <v-btn @click="invert(dataFilters.campaigns)" class="mt-2">Invert all</v-btn>
+          <v-btn small @click="setAll(dataFilters.campaigns, true)" class="mr-2 mt-2 primary">Select all</v-btn>
+          <v-btn small @click="setAll(dataFilters.campaigns, false)" class="mr-2 mt-2 primary">Deselect all</v-btn>
+          <v-btn small @click="invert(dataFilters.campaigns)" class="mr-2 mt-2 primary">Invert all</v-btn>
+          <v-btn small @click="resetCampaigns(dataFilters.campaigns)" class="mt-2 primary">Reset</v-btn>
         </v-expansion-panel-content>
       </v-expansion-panel>
 
@@ -67,8 +68,8 @@
               ></v-checkbox>
             </v-col>
           </v-row>
-          <v-btn @click="setAll(dataFilters.pwgs, true)" class="mr-2">Select all</v-btn>
-          <v-btn @click="setAll(dataFilters.pwgs, false)">Deselect all</v-btn>
+          <v-btn small @click="setAll(dataFilters.pwgs, true)" class="mr-2 primary">Select all</v-btn>
+          <v-btn small @click="setAll(dataFilters.pwgs, false)" class="primary">Deselect all</v-btn>
         </v-expansion-panel-content>
       </v-expansion-panel>
 
@@ -300,6 +301,11 @@ export default {
     invert(objects) {
       for (let key of Object.keys(objects)) {
         objects[key].selected = !objects[key].selected;
+      }
+    },
+    resetCampaigns(objects) {
+      for (let key of Object.keys(objects)) {
+        objects[key].selected = objects[key].name.toLowerCase().indexOf('nano') === -1;
       }
     }
   }
