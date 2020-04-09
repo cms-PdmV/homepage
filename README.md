@@ -8,7 +8,7 @@ Plot shows a summary of MiniAOD and NanoAOD campaigns of Monte Carlo and Data Re
 
 ### Table
 
-Table shows sum of events produced in MiniAOD and NanoAOD campaign of Monte Carlo and Data ReReco. Table is sorted in descending order based on total number of events produced in selected time range. Hovering mouse cursor over a table row will highligt same campaign in the plot. Clicking on table row will set campaign filter to that campaign only. Clicking on table row if only one campaign is selected will switch to all campaigns being selected.
+Table shows sum of events produced in MiniAOD and NanoAOD campaign of Monte Carlo and Data ReReco. Table is sorted in descending order based on total number of events produced in selected time range. Hovering mouse cursor over a table row will highlight same campaign in the plot. Clicking on table row will set campaign filter to that campaign only. Clicking on table row if only one campaign is selected will switch to all campaigns being selected.
 
 ### Options
 
