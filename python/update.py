@@ -58,21 +58,31 @@ def aggregate_data_points(data, timestamps):
 def get_week_timestamps():
     # Last week, per 8 hour timestamp
     # Round down to 8 hours
-    step = 3600 * 8  # 8 hours
-    now = int(1 + (time.time() + 3600) / step) * step - 3600
-    past = now - 3600 * 24 * 7
-    timestamps = list(range(past, now, step))
-    timestamps.append(now)
+    now = datetime.datetime.now()
+    last_point = datetime.datetime(now.year, now.month, now.day)
+    while last_point < now:
+        last_point += datetime.timedelta(hours=8)
+
+    timestamps = []
+    for _ in range(0, 22):
+        timestamps.append(datetime.datetime.timestamp(last_point))
+        last_point -= datetime.timedelta(hours=8)
+
+    timestamps.sort()
     return timestamps
 
 
 def get_month_timestamps():
     # Last 30 days, per day timestamp
-    step = 3600 * 24  # 24 hours
-    now = (1 + int((time.time() + 3600) / step)) * step - 3600
-    past = now - 3600 * 24 * 30
-    timestamps = list(range(past, now, step))
-    timestamps.append(now)
+    now = datetime.datetime.now()
+    last_point = datetime.datetime(now.year, now.month, now.day)
+    last_point += datetime.timedelta(days=1)
+    timestamps = []
+    for _ in range(0, 30):
+        timestamps.append(datetime.datetime.timestamp(last_point))
+        last_point -= datetime.timedelta(hours=8)
+
+    timestamps.sort()
     return timestamps
 
 

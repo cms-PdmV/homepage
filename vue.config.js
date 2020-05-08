@@ -1,8 +1,6 @@
 module.exports = {
-  publicPath: process.env.NODE_ENV === 'production'
-    ? ''
-    : '',
+  publicPath: '',
   devServer: {
-    port: 8004
+    port: 8006
   }
 }
