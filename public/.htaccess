@@ -1,0 +1,8 @@
+# Do not cache .json files
+<filesMatch "\.(json)$">
+  FileETag None
+  Header unset ETag
+  Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
+  Header set Pragma "no-cache"
+  Header set Expires "Wed, 15 Sep 1993 13:40:00 GMT"
+</filesMatch>
