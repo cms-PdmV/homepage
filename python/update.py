@@ -78,9 +78,9 @@ def get_month_timestamps():
     last_point = datetime.datetime(now.year, now.month, now.day)
     last_point += datetime.timedelta(days=1)
     timestamps = []
-    for _ in range(0, 30):
+    for _ in range(0, 31):
         timestamps.append(datetime.datetime.timestamp(last_point))
-        last_point -= datetime.timedelta(hours=8)
+        last_point -= datetime.timedelta(days=1)
 
     timestamps.sort()
     return timestamps
