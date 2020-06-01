@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="favicon.png">
+    <link rel="stylesheet" href="pdmv-development-ribbon.css">
     <title>PdmV Home</title>
   </head>
   <body>
@@ -13,5 +14,11 @@
     </noscript>
     <div id="app"></div>
     <!-- built files will be auto injected -->
+    <script>
+      const domain = document.location.origin;
+      if (domain && domain.includes('dev')) {
+        document.body.className += ' dev-ribbon';
+      }
+    </script>
   </body>
 </html>
