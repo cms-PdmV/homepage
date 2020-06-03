@@ -25,6 +25,7 @@
             :fetchedData="fetchedData"
             :eventBus="bus">
           </PdmVPlotFilter>
+          <v-btn small class="primary mt-2" @click="downloadPlot">Save as PNG</v-btn>
         </div>
       </v-col>
     </v-row>
@@ -170,12 +171,11 @@ export default {
     handleFilterChange(filters) {
       this.dataFilters = filters;
       this.prepareData(this.dataFilters)
+    },
+    downloadPlot() {
+      this.bus.$emit('downloadPlot');
     }
   }
 }
 
 </script>
-
-<style scoped>
-
-</style>

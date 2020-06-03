@@ -210,6 +210,10 @@
         chart.selectAll('.x.axis .tick>text')
              .attr('transform', 'rotate(-35)')
 
+        chart.selectAll('.axis .tick>text')
+             .style('text-anchor', 'end')
+             .style('font-size', '1.4em')
+
         if (this.points.length == 0) {
           return;
         }
@@ -293,7 +297,7 @@
           }
           if (campaignColors.length > 1 && this.plotData.summary.monteCarloSum > 0 && this.plotData.summary.rerecoSum > 0) {
             campaignColors.push({'name': 'Total Monte Carlo',
-                                 'color': 'white',
+                                 'color': 'rgba(0,0,0,0)',
                                  'class': 'summary-bubble',
                                  'x': legendCircleX,
                                  'y': legendCircleY,
@@ -304,7 +308,7 @@
           }
           if (campaignColors.length > 1 && this.plotData.summary.monteCarloSum > 0 && this.plotData.summary.rerecoSum > 0) {
             campaignColors.push({'name': 'Total Data ReReco',
-                                 'color': 'white',
+                                 'color': 'rgba(0,0,0,0)',
                                  'class': 'summary-bubble',
                                  'x': legendCircleX,
                                  'y': legendCircleY,
@@ -315,7 +319,7 @@
           }
           if (campaignColors.length > 1 && (this.plotData.summary.monteCarloSum > 0 || this.plotData.summary.rerecoSum > 0)) {
             campaignColors.push({'name': 'Total',
-                                 'color': 'white',
+                                 'color': 'rgba(0,0,0,0)',
                                  'class': 'summary-bubble',
                                  'x': legendCircleX,
                                  'y': legendCircleY,
@@ -335,6 +339,8 @@
                       .attr('class', function(d) { return 'legend bar ' + d.class; })
                       .attr("r", 8)
                       .style("fill", function (d) { return d.color; })
+                      .style('font-family', 'Roboto, sans-serif')
+                      .style('font-size', '0.85em')
                       .attr('display', 'none')
                       .on('mousemove', function(d) {
                         if (d.class !== 'summary-bubble') {
@@ -360,6 +366,9 @@
                       .attr("transform", function (d) { return "translate(" + (d.x + 12) + ", " + (d.y + 4) + ")"})
                       .text(function (d) { return d.name + ' (' + d.niceSum + ')'; })
                       .attr('class', function(d) { return 'legend bar ' + d.class; })
+                      .style('font-family', 'Roboto, sans-serif')
+                      .style('font-size', '0.85em')
+                      .style('fill', 'currentColor')
                       .attr('display', 'none')
                       .on('mousemove', function(d) {
                         if (d.class !== 'summary-bubble') {
@@ -381,6 +390,38 @@
                       .duration(100)
                       .attr('display', 'block')
         }
+      },
+      downloadPlot(){
+        // Select svg
+        const svg = d3.select('#' + this.plotId).select('svg').node()
+        // Serialize svg to a string
+        const serializer = new XMLSerializer()
+        const svgStr = serializer.serializeToString(svg)
+        // Create an image object where plot will be stored
+        let image = new Image()
+        // Store plot as base64 image
+        image.src = 'data:image/svg+xml;base64,' + window.btoa(svgStr);
+
+        // Append temporary canvas
+        let canvas = document.createElement('canvas');
+        canvas.width = WRAPPER.width;
+        canvas.height = WRAPPER.height;
+        document.body.appendChild(canvas);
+
+        image.onload = function() {
+          let ctx = canvas.getContext('2d');
+          ctx.fillStyle = 'white';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+          // Create a fake download link and point to canvas data
+          let fakeLink = document.createElement('a')
+          fakeLink.download = 'EventProduction.png'
+          fakeLink.href = canvas.toDataURL('image/png')
+          fakeLink.click()
+          // Remove temporary elements
+          canvas.remove()
+          fakeLink.remove()
+        }
       }
     },
     mounted () {
@@ -391,6 +432,7 @@
         .attr('viewBox', '0 0 ' + WRAPPER.width + ' ' + WRAPPER.height)
         .attr('xmlns', 'http://www.w3.org/2000/svg')
         .attr('class', 'svg')
+        .style('font-family', 'Roboto, sans-serif')
         .style('max-width', WRAPPER.width + 'px')
       this.plot.svg = d3.select('#' + this.plotId + ' svg');
       this.plot.tooltip = d3.select('body')
@@ -410,7 +452,9 @@
 
       this.plot.chart.append("text")
                      .text('EVENTS')
-                     .attr("class", "y-label")
+                     .style('text-anchor', 'end')
+                     .style('font-size', '0.85em')
+                     .style('fill', 'currentColor')
                      .attr("transform", "rotate(-90) translate(-"+WRAPPER.padding.top+", 2)")
 
       let component = this;
@@ -438,6 +482,9 @@
       this.eventBus.$on('timeRangeChange', function(timeRange) {
         component.timeRange = timeRange;
       })
+      this.eventBus.$on('downloadPlot', function () {
+        component.downloadPlot()
+      })
     }
 };
 
@@ -447,18 +494,6 @@
   .svg {
     width: 100%;
     height: 100%;
-  }
-
-  .tick > text {
-    text-anchor: end;
-    font-size: 1.4em;
-    fill: #333;
-  }
-
-  .legend {
-    font-family: Roboto;
-    fill: #333;
-    font-size: 0.85em;
   }
 
   .tooltip {
@@ -474,25 +509,20 @@
     opacity: 0.9;
   }
 
-  .y-label {
-    text-anchor: end;
-    font-size: 0.85em;
-    fill: #333;
-    font-family: Roboto;
-  }
-
   .bar {
     cursor: pointer;
   }
 
   .summary-bubble {
     cursor: auto;
-    fill: rgba(0, 0, 0, 0.6);
+    fill: currentColor;
+    opacity: 0.6;
     font-style: italic;
   }
 
   .grayline {
-    stroke: rgba(0, 0, 0, 0.075);
+    stroke: currentColor;
+    opacity: 0.15;
     stroke-width: 1;
   }
 
