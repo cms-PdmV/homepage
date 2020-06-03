@@ -224,6 +224,9 @@
              .enter()
              .append('line')
              .attr('class', 'grayline')
+             .style('stroke', 'currentColor')
+             .style('opacity', '0.15')
+             .style('stroke-width', '1')
              .attr('x1', 0)
              .attr('y1', function(d) { return WRAPPER.padding.top + y(d) })
              .attr('x2', CHART.width - (this.bubbleLegend === 'on' ? WRAPPER.padding.bubbleLegend : 0))
@@ -518,12 +521,6 @@
     fill: currentColor;
     opacity: 0.6;
     font-style: italic;
-  }
-
-  .grayline {
-    stroke: currentColor;
-    opacity: 0.15;
-    stroke-width: 1;
   }
 
   @media only screen and (max-width: 600px) {
