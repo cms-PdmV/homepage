@@ -11,12 +11,12 @@
         v-bind:style="getRowStyle(campaignData)">
       <td style="text-align: left; word-break: break-all;" @mousedown="handleRowClick(campaignData)">{{campaignData.name}}</td>
       <td style="text-align: right;" @mousedown="handleRowClick(campaignData)" :title="campaignData.data.sum"><b>{{campaignData.data.niceSum}}</b></td>
-      <td><a target="_blank" :href="'https://cms-pdmv.cern.ch/pmp/present?r=' + campaignData.name + '&growingMode=true&mode=events&groupBy='">Present</a>&nbsp;
-          <a target="_blank" :href="'https://cms-pdmv.cern.ch/pmp/historical?r=' + campaignData.name">Historical</a>
+      <td><a target="_blank" class="ml-1 mr-1" :href="'https://cms-pdmv.cern.ch/pmp/present?r=' + campaignData.name + '&growingMode=true&mode=events&groupBy='">Present</a>
+          <a target="_blank" class="ml-1 mr-1" :href="'https://cms-pdmv.cern.ch/pmp/historical?r=' + campaignData.name">Historical</a>
       </td>
       <td>
         <span v-if="campaignData.data.type !== 'rereco'" v-for="pwgName in campaignData.data.pwgs">
-          <a target="_blank" :href="'https://cms-pdmv.cern.ch/mcm/requests?member_of_campaign=' + campaignData.name + '&pwg=' + pwgName">{{pwgName}}</a>&nbsp;
+          <a target="_blank" class="ml-1 mr-1" :href="'https://cms-pdmv.cern.ch/mcm/requests?member_of_campaign=' + campaignData.name + '&pwg=' + pwgName">{{pwgName}}</a>
         </span>
       </td>
     </tr>

@@ -19,12 +19,14 @@
       <li>Data ReReco
         <ul>
           <li><a target="_blank" :href="'https://twiki.cern.ch/twiki/bin/view/CMS/PdmVDataReprocessing'">Reprocessing TWiki</a> - information about data reprocessing in PdmV</li>
+          <li><a target="_blank" :href="'https://cms-pdmv.cern.ch/rereco/'">ReReco</a> - ReReco management website</li>
         </ul>
       </li>
       <li>Release Validation
         <ul>
           <li><a target="_blank" :href="'https://cms-pdmv.cern.ch/relmon/'">RelMon</a> - RelMon reports</li>
           <li><a target="_blank" :href="'https://cms-pdmv.cern.ch/valdb/'">ValDB</a> - Validation reports</li>
+          <li><a target="_blank" :href="'https://cms-pdmv.cern.ch/relmonservice/'">RelMonService</a> - RelMon Service</li>
         </ul>
       </li>
       <li>Misc
