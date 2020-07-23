@@ -3,7 +3,7 @@
     <v-expansion-panels>
       <v-expansion-panel>
         <v-expansion-panel-header>Priority Block Filter&nbsp;
-          <span style="opacity: 0.6" v-if="dataFiltersNumbers.blocks.selected != dataFiltersNumbers.blocks.all">
+          <span class="selected-number-text" v-if="dataFiltersNumbers.blocks.selected != dataFiltersNumbers.blocks.all">
             <i>
               (selected {{dataFiltersNumbers.blocks.selected}} out of {{dataFiltersNumbers.blocks.all}})
             </i>
@@ -25,7 +25,7 @@
 
       <v-expansion-panel>
         <v-expansion-panel-header>Campaign Filter&nbsp;
-          <span style="opacity: 0.6" v-if="dataFiltersNumbers.campaigns.selected != dataFiltersNumbers.campaigns.all">
+          <span class="selected-number-text" v-if="dataFiltersNumbers.campaigns.selected != dataFiltersNumbers.campaigns.all">
             <i>
               (selected {{dataFiltersNumbers.campaigns.selected}} out of {{dataFiltersNumbers.campaigns.all}})
             </i>
@@ -48,7 +48,7 @@
 
       <v-expansion-panel>
         <v-expansion-panel-header>PWG Filter&nbsp;
-          <span style="opacity: 0.6" v-if="dataFiltersNumbers.pwgs.selected != dataFiltersNumbers.pwgs.all">
+          <span class="selected-number-text" v-if="dataFiltersNumbers.pwgs.selected != dataFiltersNumbers.pwgs.all">
             <i>
               (selected {{dataFiltersNumbers.pwgs.selected}} out of {{dataFiltersNumbers.pwgs.all}})
             </i>
@@ -325,6 +325,11 @@ export default {
 
 .v-input__slot {
   margin-bottom: 0 !important;
+}
+
+.selected-number-text {
+  opacity: 0.6;
+  margin-left: 4px;
 }
 
 </style>
