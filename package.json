@@ -1,5 +1,5 @@
 {
-  "name": "PdmV Homepage",
+  "name": "PdmVHomepage",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -15,7 +15,7 @@
     "js-md5": "^0.7.3",
     "roboto-fontface": "*",
     "vue": "^2.6.11",
-    "vuetify": "^2.3.5"
+    "vuetify": "^2.3.7"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.12.1",
