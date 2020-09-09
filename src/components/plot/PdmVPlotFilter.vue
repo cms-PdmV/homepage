@@ -279,12 +279,14 @@ export default {
           return 0;
         }
         newFilters.campaigns = newFilters.campaigns.sort(compare)
-        let availableBlocks = [{'name': 'block1', 'displayName': 'Block 1 (110k)', 'selected': true, 'title': 'Priority ⩾ 110000'},
+        let availableBlocks = [{'name': 'block0', 'displayName': 'Block 0 (130k)', 'selected': true, 'title': 'Priority ⩾ 130000'},
+                               {'name': 'block1', 'displayName': 'Block 1 (110k)', 'selected': true, 'title': 'Priority 110000 - 130000'},
                                {'name': 'block2', 'displayName': 'Block 2 (90k)','selected': true, 'title': 'Priority 90000 - 109999'},
                                {'name': 'block3', 'displayName': 'Block 3 (85k)','selected': true, 'title': 'Priority 85000 - 89999'},
                                {'name': 'block4', 'displayName': 'Block 4 (80k)','selected': true, 'title': 'Priority 80000 - 84999'},
                                {'name': 'block5', 'displayName': 'Block 5 (70k)','selected': true, 'title': 'Priority 70000 - 79999'},
-                               {'name': 'block6', 'displayName': 'Block 6 (63k)','selected': true, 'title': 'Priority ⩽ 69999'},];
+                               {'name': 'block6', 'displayName': 'Block 6 (63k)','selected': true, 'title': 'Priority 63000 - 69999'},
+                               {'name': 'block7', 'displayName': 'Block 7 (<63k)', 'selected': true, 'title': 'Priority ⩽ 63000'},];
         for (let availableBlock of availableBlocks) {
           if (this.fetchedData.blocks.includes(availableBlock.name)) {
             newFilters.blocks.push(availableBlock);

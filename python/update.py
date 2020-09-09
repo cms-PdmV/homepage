@@ -144,12 +144,14 @@ def get_year_timestamps(year=None):
 
 granularity = 500
 priority_blocks = {
-    'block1': '110000,',
+    'block0': '130000,',
+    'block1': '110000,130000',
     'block2': '90000,110000',
     'block3': '85000,90000',
     'block4': '80000,85000',
     'block5': '70000,80000',
-    'block6': ',70000',
+    'block6': '63000,70000',
+    'block7': ',63000',
 }
 campaigns = {}
 campaign_list = get_list_of_campaigns()
