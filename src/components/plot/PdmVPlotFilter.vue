@@ -128,6 +128,9 @@
             <span title="Show last 12 weeks in 1 week intervals">
               <v-radio :key="'12_weeks'" :label="'12 weeks'" :value="'12_weeks'"></v-radio>
             </span>
+            <span title="Show last 24 weeks in 1 week intervals">
+              <v-radio :key="'24_weeks'" :label="'24 weeks'" :value="'24_weeks'"></v-radio>
+            </span>
             <span title="Show last 12 months in 1 month intervals">
               <v-radio :key="'12_months'" :label="'12 months'" :value="'12_months'"></v-radio>
             </span>
