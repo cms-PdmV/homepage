@@ -1,10 +1,12 @@
 <template>
   <v-app>
     <v-app-bar app style="background-color: #fff">
-      <v-toolbar-title class="headline">
-        <span>PdmV</span>
-        <span class="font-weight-light">Homepage</span>
-      </v-toolbar-title>
+      <a href="" class="no-decoration">
+        <v-toolbar-title class="headline">
+          <span>PdmV</span>
+          <span class="font-weight-light">Homepage</span>
+        </v-toolbar-title>
+      </a>
       <v-spacer></v-spacer>
       <v-btn
         text
@@ -72,3 +74,15 @@ export default {
   }),
 };
 </script>
+
+<style scoped>
+
+.headline {
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+a.no-decoration {
+  text-decoration: none;
+}
+
+</style>
