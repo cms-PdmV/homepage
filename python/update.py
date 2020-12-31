@@ -180,6 +180,7 @@ all_timestamps['12_weeks'] = get_quarter_timestamps()
 all_timestamps['24_weeks'] = get_six_months_timestamps()
 all_timestamps['12_months'] = get_year_timestamps()
 all_timestamps['2019_monthly'] = get_year_timestamps(2019)
+all_timestamps['2020_monthly'] = get_year_timestamps(2020)
 
 for timestamp_name, timestamps in all_timestamps.items():
     # Split all campaigns into nice equal timestamps
