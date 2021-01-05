@@ -15,12 +15,14 @@ Table shows sum of events produced in MiniAOD and NanoAOD campaign of Monte Carl
 #### Priority block filter
 
 Priority block filter allows to filter statistics by their priority in computing.
- * Block 1 - ⩾ 110000
+ * Block 0 - ⩾ 130000
+ * Block 1 - 110000 - 129999
  * Block 2 - 90000 - 109999
  * Block 3 - 85000 - 89999
  * Block 4 - 80000 - 84999
  * Block 5 - 70000 - 79999
- * Block 6 - ⩽ 69999
+ * Block 6 - 63000 - 69999
+ * Block 7 - ⩽ 62999
 
 #### Campaign filter
 
