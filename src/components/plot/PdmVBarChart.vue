@@ -472,15 +472,21 @@
       })
       this.eventBus.$on('plotModeChange', function(mode) {
         component.plotMode = mode;
-        component.prepareData();
+        if (component.plotData.timestamps) {
+          component.prepareData();
+        }
       })
       this.eventBus.$on('plotScaleChange', function(scale) {
         component.plotScale = scale;
-        component.draw(component.points.length === 0)
+        if (component.plotData.timestamps) {
+          component.draw(component.points.length === 0);
+        }
       })
       this.eventBus.$on('bubbleLegendChange', function(bubbleLegend) {
         component.bubbleLegend = bubbleLegend;
-        component.draw(component.points.length === 0)
+        if (component.plotData.timestamps) {
+          component.draw(component.points.length === 0);
+        }
       })
       this.eventBus.$on('timeRangeChange', function(timeRange) {
         component.timeRange = timeRange;

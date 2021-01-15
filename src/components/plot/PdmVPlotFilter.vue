@@ -10,7 +10,7 @@
           </span>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
-          <span v-for="block in dataFilters.blocks" :title="block.title">
+          <span v-for="block in dataFilters.blocks" :title="block.title" :key="block.title">
             <v-checkbox
               class="nomargin"
               v-model="block.selected"
@@ -178,11 +178,38 @@ export default {
       plotMode: 'cumulative',
       plotScale: 'linear',
       bubbleLegend: 'off',
-      timeRange: 'week'
+      timeRange: undefined,
+      initialCampaigns: [],
+      initialBlocks: [],
+      initialPWGs: [],
+      initializedFilters: false,
     }
   },
   created () {
-
+    const query = this.$route.query;
+    if (query.campaigns) {
+        this.initialCampaigns = query.campaigns.split(',').filter(Boolean);
+    }
+    if (query.pwgs) {
+        this.initialPWGs = query.pwgs.split(',').filter(Boolean);
+    }
+    if (query.blocks) {
+        this.initialBlocks = query.blocks.split(',').filter(Boolean);
+    }
+    if (query.plot_mode) {
+      this.plotMode = query.plot_mode;
+    }
+    if (query.plot_scale) {
+      this.plotScale = query.plot_scale;
+    }
+    if (query.bubble_legend) {
+      this.bubbleLegend = query.bubble_legend;
+    }
+    if (query.time_range) {
+      this.timeRange = query.time_range;
+    } else {
+      this.timeRange = 'week';
+    }
   },
   props: {
     fetchedData: {
@@ -195,7 +222,6 @@ export default {
     }
   },
   mounted () {
-    let component = this
     this.eventBus.$on('campaignClick', function (campaign) {
       let onlyCurrentSelected = component.dataFilters.campaigns.reduce(function(res, c) {return res && ((c.name === campaign.name) == (c.selected))}, true)
       component.dataFilters.campaigns.map(function(c) {c.selected = (c.name === campaign.name) || onlyCurrentSelected})
@@ -207,6 +233,11 @@ export default {
     },
     dataFilters: {
       handler: function (newVal, oldVal) {
+        if (this.initializedFilters) {
+          // Delete query
+          this.$router.replace({query: {}}).catch(() => {});
+        }
+        this.initializedFilters = true;
         let enabledBlocks = Object.keys(newVal.blocks).reduce(function(map, key) {
           if (newVal.blocks[key].selected) {
             map.push(newVal.blocks[key].name)
@@ -254,6 +285,7 @@ export default {
   },
   methods: {
     prepareFilters() {
+      const component = this;
       let newFilters = {}
       newFilters.blocks = []
       newFilters.campaigns = []
@@ -262,34 +294,15 @@ export default {
         for (let campaignName in this.fetchedData.data) {
           newFilters.campaigns.push({'name': campaignName, 'selected': campaignName.toLowerCase().indexOf('nano') === -1});
         }
-        let compare = function(a, b) {
-          let aName = a.name.toLowerCase();
-          let bName = b.name.toLowerCase();
-          let aNano = aName.indexOf('nano') !== -1;
-          let bNano = bName.indexOf('nano') !== -1;
-          if (!aNano && bNano) {
-            return -1;
-          }
-          if (aNano && !bNano) {
-            return 1;
-          }
-          if (aName < bName) {
-            return -1;
-          }
-          if  (aName > bName) {
-            return 1;
-          }
-          return 0;
-        }
-        newFilters.campaigns = newFilters.campaigns.sort(compare)
-        let availableBlocks = [{'name': 'block0', 'displayName': 'Block 0 (130k)', 'selected': true, 'title': 'Priority ⩾ 130000'},
-                               {'name': 'block1', 'displayName': 'Block 1 (110k)', 'selected': true, 'title': 'Priority 110000 - 130000'},
-                               {'name': 'block2', 'displayName': 'Block 2 (90k)','selected': true, 'title': 'Priority 90000 - 109999'},
-                               {'name': 'block3', 'displayName': 'Block 3 (85k)','selected': true, 'title': 'Priority 85000 - 89999'},
-                               {'name': 'block4', 'displayName': 'Block 4 (80k)','selected': true, 'title': 'Priority 80000 - 84999'},
-                               {'name': 'block5', 'displayName': 'Block 5 (70k)','selected': true, 'title': 'Priority 70000 - 79999'},
-                               {'name': 'block6', 'displayName': 'Block 6 (63k)','selected': true, 'title': 'Priority 63000 - 69999'},
-                               {'name': 'block7', 'displayName': 'Block 7 (<63k)', 'selected': true, 'title': 'Priority ⩽ 63000'},];
+        newFilters.campaigns = newFilters.campaigns.sort(this.compareCampaigns)
+        let availableBlocks = [{'name': 'block0', 'number': '0', 'displayName': 'Block 0 (130k)', 'selected': true, 'title': 'Priority ⩾ 130000'},
+                               {'name': 'block1', 'number': '1', 'displayName': 'Block 1 (110k)', 'selected': true, 'title': 'Priority 110000 - 130000'},
+                               {'name': 'block2', 'number': '2', 'displayName': 'Block 2 (90k)','selected': true, 'title': 'Priority 90000 - 109999'},
+                               {'name': 'block3', 'number': '3', 'displayName': 'Block 3 (85k)','selected': true, 'title': 'Priority 85000 - 89999'},
+                               {'name': 'block4', 'number': '4', 'displayName': 'Block 4 (80k)','selected': true, 'title': 'Priority 80000 - 84999'},
+                               {'name': 'block5', 'number': '5', 'displayName': 'Block 5 (70k)','selected': true, 'title': 'Priority 70000 - 79999'},
+                               {'name': 'block6', 'number': '6', 'displayName': 'Block 6 (63k)','selected': true, 'title': 'Priority 63000 - 69999'},
+                               {'name': 'block7', 'number': '7', 'displayName': 'Block 7 (<63k)', 'selected': true, 'title': 'Priority ⩽ 63000'},];
         for (let availableBlock of availableBlocks) {
           if (this.fetchedData.blocks.includes(availableBlock.name)) {
             newFilters.blocks.push(availableBlock);
@@ -297,6 +310,18 @@ export default {
         }
         for (let pwg of this.fetchedData.pwgs) {
           newFilters.pwgs.push({'name': pwg, 'selected': true});
+        }
+        if (this.initialCampaigns.length) {
+          newFilters.campaigns.map(function(c) {c.selected = component.initialCampaigns.includes(c.name)});
+          this.initialCampaigns = [];
+        }
+        if (this.initialPWGs.length) {
+          newFilters.pwgs.map(function(p) {p.selected = component.initialPWGs.includes(p.name)});
+          this.initialPWGs = [];
+        }
+        if (this.initialBlocks.length) {
+          newFilters.blocks.map(function(b) {b.selected = component.initialBlocks.includes(b.number)});
+          this.initialBlocks = [];
         }
       }
       this.dataFilters = newFilters;
@@ -315,6 +340,34 @@ export default {
       for (let key of Object.keys(objects)) {
         objects[key].selected = objects[key].name.toLowerCase().indexOf('nano') === -1;
       }
+    },
+    compareCampaigns(a, b) {
+      let aName = a.name.toLowerCase();
+      let bName = b.name.toLowerCase();
+      let aNano = aName.indexOf('nano') !== -1;
+      let bNano = bName.indexOf('nano') !== -1;
+      if (!aNano && bNano) {
+        return -1;
+      }
+      if (aNano && !bNano) {
+        return 1;
+      }
+      if (aName < bName) {
+        return -1;
+      }
+      if  (aName > bName) {
+        return 1;
+      }
+      return 0;
+    },
+    getAllValues() {
+      return {'campaigns': this.dataFilters.campaigns,
+              'blocks': this.dataFilters.blocks,
+              'pwgs': this.dataFilters.pwgs,
+              'plotMode': this.plotMode,
+              'plotScale': this.plotScale,
+              'bubbleLegend': this.bubbleLegend,
+              'timeRange': this.timeRange,}
     }
   }
 }
