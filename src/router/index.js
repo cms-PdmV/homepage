@@ -7,11 +7,7 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    name: 'MainComponent',
-    component: MainComponent
-  },
-  {
-    path: '/home',
+    alias: ['/home', '/cms-pdmv'],
     name: 'MainComponent',
     component: MainComponent
   }
