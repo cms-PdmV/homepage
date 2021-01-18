@@ -38,6 +38,8 @@
         <div class="ml-2 mr-2">
           <b>URL:</b> <small><a :href="shareURL">{{shareURL}}</a></small>
           <br>
+          <v-btn small class="primary mt-1 mb-2" @click="copySharedURL">Copy URL</v-btn>
+          <br>
           <b>Please note:</b> sharing this URL will share selected filters and options, but does not include plot data (no data snapshot).
           Plot in PdmV Homepage is updated multiple times per day, so it is likely that using this URL in the future will
           yield a different histogram - some campaigns/blocks/PWGs might not be present anymore. Time range "last X days/weeks/months"
@@ -51,6 +53,9 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-snackbar v-model="copiedSnackbar" :timeout="1500" color="success">
+      Copied to clipboard!
+    </v-snackbar>
   </div>
 </template>
 
@@ -63,7 +68,9 @@ import PdmVPlotFilter from './PdmVPlotFilter.vue'
 import md5 from 'js-md5'
 import Vue from 'vue'
 import axios from 'axios'
+import VueClipboard from 'vue-clipboard2'
 
+Vue.use(VueClipboard)
 
 export default {
   name: 'MainComponent',
@@ -73,6 +80,7 @@ export default {
       fetchedData: {},
       plotData: {'summary': {}},
       shareURL: undefined,
+      copiedSnackbar: false,
     }
   },
   mounted () {
@@ -218,6 +226,15 @@ export default {
         url += '?' + query.join('&');
       }
       this.shareURL = url;
+    },
+    copySharedURL() {
+      const component = this;
+      const container = document.querySelector('.v-dialog');
+      this.$copyText(this.shareURL, container).then(function (e) {
+        component.copiedSnackbar = true;
+      }, function (e) {
+        alert('Could not copy!');
+      })
     }
   }
 }
