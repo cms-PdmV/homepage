@@ -1,8 +1,9 @@
+import sys
 import json
 import time
 import os
 import datetime
-# sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
+sys.path.append('/afs/cern.ch/cms/PPD/PdmV/tools/McM/')
 from rest import McM
 
 
@@ -156,22 +157,13 @@ priority_blocks = {
 campaigns = {}
 campaign_list = get_list_of_campaigns()
 
+fetch_start = time.time()
 for i, campaign in enumerate(campaign_list):
     print('Getting %s from pMp, %s/%s' % (campaign, i + 1, len(campaign_list)))
-    campaigns[campaign] = {}
-    campaign_results = pmp._McM__get('api/historical?r=%s&granularity=3' % (campaign))
-    pwgs = campaign_results['results']['pwg'].keys()
-    print('Got %s pwgs for %s' % (len(pwgs), campaign))
-    for pwg in pwgs:
-        campaigns[campaign][pwg] = {}
-        for block_name, priority in priority_blocks.items():
-            print('Getting plot for %s %s %s' % (campaign, pwg, block_name))
-            campaigns[campaign][pwg][block_name] = pmp._McM__get('api/historical?r=%s&granularity=%s&priority=%s&pwg=%s' % (campaign,
-                                                                                                                            granularity,
-                                                                                                                            priority,
-                                                                                                                            pwg))['results']['data']
+    campaigns[campaign] = pmp._McM__get('api/historical?r=%s&granularity=%s&aggregate=False' % (campaign, granularity))['results']['data']
 
-print('Got %s campaigns' % (len(campaigns)))
+fetch_end = time.time()
+print('Got %s campaigns in %.2fs' % (len(campaigns), fetch_end - fetch_start))
 all_timestamps = {}
 
 all_timestamps['week'] = get_week_timestamps()
