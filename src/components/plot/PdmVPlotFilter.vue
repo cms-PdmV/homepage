@@ -222,6 +222,7 @@ export default {
     }
   },
   mounted () {
+    const component = this;
     this.eventBus.$on('campaignClick', function (campaign) {
       let onlyCurrentSelected = component.dataFilters.campaigns.reduce(function(res, c) {return res && ((c.name === campaign.name) == (c.selected))}, true)
       component.dataFilters.campaigns.map(function(c) {c.selected = (c.name === campaign.name) || onlyCurrentSelected})
