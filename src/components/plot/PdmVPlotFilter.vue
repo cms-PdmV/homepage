@@ -183,6 +183,7 @@ export default {
       initialBlocks: [],
       initialPWGs: [],
       initializedFilters: false,
+      previouslyShownCampaigns: [],
     }
   },
   created () {
@@ -224,8 +225,14 @@ export default {
   mounted () {
     const component = this;
     this.eventBus.$on('campaignClick', function (campaign) {
-      let onlyCurrentSelected = component.dataFilters.campaigns.reduce(function(res, c) {return res && ((c.name === campaign.name) == (c.selected))}, true)
-      component.dataFilters.campaigns.map(function(c) {c.selected = (c.name === campaign.name) || onlyCurrentSelected})
+      let onlyCurrentSelected = component.dataFilters.campaigns.reduce(function(res, c) {return res && ((c.name === campaign.name) == (c.selected))}, true);
+      if (onlyCurrentSelected && component.previouslyShownCampaigns.length) {
+        component.dataFilters.campaigns.map(function(c) {c.selected = component.previouslyShownCampaigns.indexOf(c.name) !== -1});
+        component.previouslyShownCampaigns = [];
+      } else {
+        component.previouslyShownCampaigns = component.dataFilters.campaigns.reduce(function(res, c) { if (c.selected) { res.push(c.name) } return res;}, []);
+        component.dataFilters.campaigns.map(function(c) {c.selected = (c.name === campaign.name) || onlyCurrentSelected});
+      }
     })
   },
   watch: {
