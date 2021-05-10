@@ -13,7 +13,7 @@
           </li>
           <li><a target="_blank" :href="'https://cms-pdmv.cern.ch/grasp/'">GrASP</a> - Group Analysis Sample Page</li>
           <li><a target="_blank" :href="'https://twiki.cern.ch/twiki/bin/view/CMS/PdmVMcCampaigns  '">Campaigns TWiki</a> - Monte Carlo campaigns TWiki</li>        
-          <li><a target="_blank" :href="'https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVAnalysisSummaryTable'">Analysis table</a> - analysis guideline</li>
+          <li><a target="_blank" :href="'https://twiki.cern.ch/twiki/bin/view/CMS/PdmVRun2LegacyAnalysis'">Analysis table</a> - analysis guideline</li>
           <li><a target="_blank" :href="'https://hypernews.cern.ch/HyperNews/CMS/get/prep-ops.html'">MC HyperNews</a> - forum dedicated to the discussion and advertisement of requests managed within the McM</li>
         </ul>
       </li>
