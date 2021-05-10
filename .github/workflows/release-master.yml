@@ -115,6 +115,7 @@ jobs:
         cd Homepage
         mv dist Homepage
         tar -czf $archive_name Homepage
+        mv $archive_name ../
 
     - name: Get upload info from artifact files
       id: upload_info
