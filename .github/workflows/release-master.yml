@@ -111,9 +111,9 @@ jobs:
     - name: Create archive
       id: create_archive
       run: |
+        archive_name=$(cat info/archive_name)
         cd Homepage
         mv dist Homepage
-        archive_name=$(cat info/archive_name)
         tar -czf $archive_name Homepage
 
     - name: Get upload info from artifact files
